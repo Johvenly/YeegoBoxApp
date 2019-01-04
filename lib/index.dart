@@ -1,0 +1,56 @@
+import 'package:flutter/material.dart';
+import 'home/home.dart';
+import 'classify/classify.dart';
+import 'release/task.dart';
+import 'mine/mine.dart';
+
+class Index extends StatefulWidget {
+  @override
+  IndexState createState()  => new IndexState();
+}
+
+class IndexState extends State<Index>{
+  @override
+  int _currentIndex = 0;            //当前页面索引
+  var _pageList = <StatefulWidget>[
+    new Home(),
+    new Classify(),
+    new RTask(),
+    new Mine()
+  ];
+  Widget build(BuildContext context) {
+    /*-----bottom nav start-------*/
+    BottomNavigationBarItem _bottomNavigationBarItem(IconData icon, IconData activeIcon, String title, int itemIndex){
+      var _bottomNavigationBarColor = Color.fromARGB(255, 166, 166, 166);
+      if(_currentIndex == itemIndex){
+        _bottomNavigationBarColor = Colors.green;
+      }
+      return BottomNavigationBarItem(icon: Icon(icon, color: _bottomNavigationBarColor), activeIcon: Icon(activeIcon, color: _bottomNavigationBarColor), title: Text(title, style: TextStyle(color: _bottomNavigationBarColor)));
+    }
+    BottomNavigationBar _bottomNavigationBar = BottomNavigationBar(
+      items: [
+        _bottomNavigationBarItem(Icons.home, Icons.home, '首页', 0),
+        _bottomNavigationBarItem(Icons.view_list, Icons.filter_list, '试客任务', 1),
+        _bottomNavigationBarItem(Icons.shopping_cart, Icons.shopping_cart, '浏览任务', 2),
+        _bottomNavigationBarItem(Icons.person, Icons.account_circle, '我的', 3)
+      ],
+      type: BottomNavigationBarType.fixed,
+      currentIndex: _currentIndex,
+      fixedColor: Colors.green,
+      onTap: (index){
+        setState(() {
+          _currentIndex = index;      //修改当前页面索引  
+        });
+      },
+    );
+    /*-----bottom nav end-------*/
+    return new MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Scaffold(
+        body: _pageList[_currentIndex],
+        bottomNavigationBar: _bottomNavigationBar,
+        resizeToAvoidBottomPadding: false,
+      ),
+    );
+  }
+}
