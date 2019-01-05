@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'home/home.dart';
-import 'classify/classify.dart';
+import 'browse/task.dart';
 import 'release/task.dart';
 import 'mine/mine.dart';
 
@@ -14,8 +14,8 @@ class IndexState extends State<Index>{
   int _currentIndex = 0;            //当前页面索引
   var _pageList = <StatefulWidget>[
     new Home(),
-    new Classify(),
     new RTask(),
+    new BTask(),
     new Mine()
   ];
   Widget build(BuildContext context) {
@@ -31,8 +31,8 @@ class IndexState extends State<Index>{
       items: [
         _bottomNavigationBarItem(Icons.home, Icons.home, '首页', 0),
         _bottomNavigationBarItem(Icons.view_list, Icons.filter_list, '试客任务', 1),
-        _bottomNavigationBarItem(Icons.shopping_cart, Icons.shopping_cart, '浏览任务', 2),
-        _bottomNavigationBarItem(Icons.person, Icons.account_circle, '我的', 3)
+        _bottomNavigationBarItem(Icons.camera, Icons.camera, '浏览任务', 2),
+        _bottomNavigationBarItem(Icons.person_outline, Icons.person, '我的', 3)
       ],
       type: BottomNavigationBarType.fixed,
       currentIndex: _currentIndex,

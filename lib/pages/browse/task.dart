@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-class RTask extends StatefulWidget{
-  State<StatefulWidget> createState() => new RTaskState();
+class BTask extends StatefulWidget{
+  State<StatefulWidget> createState() => new BTaskState();
 }
 
-class RTaskState extends State with SingleTickerProviderStateMixin{
+class BTaskState extends State with SingleTickerProviderStateMixin{
   TabController _tabController;
 
   @override
@@ -37,7 +37,7 @@ class RTaskState extends State with SingleTickerProviderStateMixin{
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         appBar: AppBar(
-          // elevation: 0,
+          elevation: 0,
           backgroundColor: Colors.green,
           title: Text('浏览任务'),
           bottom: new TabBar(
