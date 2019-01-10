@@ -12,11 +12,12 @@ class Index extends StatefulWidget {
 class IndexState extends State<Index>{
   @override
   int _currentIndex = 0;            //当前页面索引
+  PageController _pageController = new PageController(initialPage: 0);
   var _pageList = <StatefulWidget>[
     new Home(),
     new RTask(),
     new BTask(),
-    new Mine()
+    new Mine(),
   ];
   Widget build(BuildContext context) {
     /*-----bottom nav start-------*/
@@ -40,17 +41,26 @@ class IndexState extends State<Index>{
       onTap: (index){
         setState(() {
           _currentIndex = index;      //修改当前页面索引  
+          _pageController.jumpToPage(index);
+          // _pageController.animateToPage(index,
+          //   duration: const Duration(milliseconds: 300), curve: Curves.ease);
         });
       },
     );
     /*-----bottom nav end-------*/
-    return new MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        body: _pageList[_currentIndex],
+    return new Scaffold(
+        // body: _pageList[_currentIndex],
+        body: new PageView(
+          children: _pageList,
+          controller: _pageController,
+          onPageChanged: (int index){
+            setState(() {
+              _currentIndex = index;      //修改当前页面索引 
+            });
+          }
+        ),
         bottomNavigationBar: _bottomNavigationBar,
         resizeToAvoidBottomPadding: false,
-      ),
-    );
+      );
   }
 }

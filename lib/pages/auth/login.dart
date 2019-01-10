@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import '../../config/api.dart';
+import '../../common/http.dart';
+import '../../common/user.dart';
 
 class Login extends StatefulWidget{
   State<StatefulWidget> createState() => new LoginState();
@@ -7,8 +11,26 @@ class Login extends StatefulWidget{
 
 class LoginState extends State<Login>{
 
+  TextEditingController _usernameController = new TextEditingController();
+  TextEditingController _passwordController = new TextEditingController();
+
   @override
   Widget build(BuildContext context){
+
+    void _postLogin(){
+      Http.post(API.login, data: {'username': _usernameController.text, 'password': _passwordController.text}).then((result){
+        if(result['code'] == 1){
+          User.saveUserInfo(result['data']);
+          UserEvent.eventBus.fire(new UserEvent());
+          Fluttertoast.showToast(msg: '登录成功', gravity: ToastGravity.CENTER).then((e){
+            Navigator.of(super.context).pop();
+          });
+        }else{
+          Fluttertoast.showToast(msg: result['msg'], gravity: ToastGravity.CENTER);
+          return;
+        }
+      });
+    }
 
     Widget _body = new Container(
       child: new Column(
@@ -41,7 +63,7 @@ class LoginState extends State<Login>{
                 elevation: 0,
                 backgroundColor: Colors.transparent,
                 leading: IconButton(
-                  icon: BackButtonIcon(),
+                  icon: Icon(Icons.close),
                   onPressed: (){
                     Navigator.pop(super.context);
                   },
@@ -54,18 +76,24 @@ class LoginState extends State<Login>{
           new Padding(
             padding: EdgeInsets.only(top:45, left: 45, right: 45),
             child: new TextField(
-              // style: hintTips,
-              // controller: _userNameController,
-              decoration: new InputDecoration(hintText: "请输入用户名"),
+              controller: _usernameController,
+              decoration: new InputDecoration(
+                hintText: "请输入用户名",
+                focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.green)),
+              ),
+              cursorColor: Colors.green,
               obscureText: false,
             ),
           ),
           new Padding(
             padding: EdgeInsets.only(top: 25, left: 45, right: 45),
             child: new TextField(
-              // style: hintTips,
-              // controller: _userPassController,
-              decoration: new InputDecoration(hintText: "请输入用户密码"),
+              controller: _passwordController,
+              decoration: new InputDecoration(
+                hintText: "请输入用户密码",
+                focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.green)),
+              ),
+              cursorColor: Colors.green,
               obscureText: true,
             ),
           ),
@@ -87,8 +115,7 @@ class LoginState extends State<Login>{
                 borderRadius: BorderRadius.all(Radius.circular(40)),
               ),
               onPressed: () {
-                // _postLogin(
-                //     _userNameController.text, _userPassController.text);
+                _postLogin();
               },
               child: Text('马上登录', style: new TextStyle(color: Colors.white, fontSize: 16.0),)
             ),

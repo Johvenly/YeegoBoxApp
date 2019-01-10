@@ -8,10 +8,25 @@ class Home extends StatefulWidget{
   State<StatefulWidget> createState() => new HomeState();
 }
 
-class HomeState extends State with AutomaticKeepAliveClientMixin{
-  @override
-  bool get wantKeepAlive => true;
+class HomeState extends State{
+  // @override
+  // bool get wantKeepAlive => true;
 
+  //初始化控件状态
+  @override
+    void initState() {
+      super.initState();
+      initData().then((e){
+        
+      });
+    }
+
+  //初始化界面数据
+  @override
+  Future<dynamic> initData() async{
+    await print('Home界面数据初始化...');
+  }
+  
   @override
   Widget build(BuildContext context){
     List _slides = <Widget>[
@@ -176,6 +191,8 @@ class HomeState extends State with AutomaticKeepAliveClientMixin{
                 focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.green),),
               ),
               cursorColor: Colors.green,
+              // autofocus: true,
+              focusNode: FocusNode(),
             ),
           ),
           new Padding(

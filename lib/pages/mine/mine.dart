@@ -1,13 +1,64 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../auth/login.dart';
+import '../../config/api.dart';
+import '../../common/user.dart';
+import '../../common/loading.dart';
+import 'setting/setting.dart';
+import 'resetpassword/resetpassword.dart';
+import 'wallet/wallet.dart';
 
 class Mine extends StatefulWidget{
   State<StatefulWidget> createState() => new MineState();
 }
 
-class MineState extends State{
-  final bool _isLogin = false;
+class MineState extends State with AutomaticKeepAliveClientMixin{
+  @override
+  bool get wantKeepAlive => true;
+
+  //数据控制字段
+  bool _login = false;
+  bool _loaded = true;
+  Map<String, dynamic> _userInfo;
+
+  @override
+    void initState() {
+      super.initState();
+      UserEvent.eventBus.on<UserEvent>().listen((_){
+        initData();
+      });
+
+      initData().then((e){
+        setState(() {
+          _loaded = false;
+        });
+      });
+    }
+
+  //初始化界面数据
+  @override
+  Future<dynamic> initData() async{
+    User.isLogin().then((verify){
+      if(verify){
+        //改变登录状态标识
+        setState(() {
+          _login = true;
+        });
+        //根据缓存初始化用户头像等数据
+        User.getUserInfo().then((result){
+          setState(() {
+            _userInfo = result;
+          });
+        });
+      }else{
+        setState(() {
+          _login = false;
+        });
+      }
+    });
+    print('Mine界面数据初始化...');
+  }
+
   @override
   Widget build(BuildContext context){
     Widget _body = new Container(
@@ -24,12 +75,26 @@ class MineState extends State{
                   color: Colors.green,
                 ),
                 //头像/登录块
-                child: new GestureDetector(
+                child: _login ? new GestureDetector(
+                  child: new Column(
+                    children: <Widget>[
+                      new CircleAvatar(backgroundColor: Colors.green ,backgroundImage: (_userInfo[User.FIELD_AVATAR] != null) ? NetworkImage(API.host + _userInfo[User.FIELD_AVATAR]) : new AssetImage('assets/images/avatar.jpg'), radius: 50),
+                      new Container(
+                        child: Text(_userInfo[User.FIELD_MOBILE], style: TextStyle(color: Colors.white, fontSize: 16, height: 1.5),),
+                        margin: EdgeInsets.only(top: 8),
+                      )
+                    ],
+                  ),
+                  onTap: (){
+
+                  },
+                ) : 
+                new GestureDetector(
                   child: new Column(
                     children: <Widget>[
                       new CircleAvatar(backgroundImage: new AssetImage('assets/images/avatar.jpg'), radius: 50),
                       new Container(
-                        child: Text('Johwen Chou', style: TextStyle(color: Colors.white, fontSize: 16),),
+                        child: Text('登录/注册', style: TextStyle(color: Colors.white, fontSize: 16, height: 1.2),),
                         margin: EdgeInsets.only(top: 8),
                       )
                     ],
@@ -37,41 +102,88 @@ class MineState extends State{
                   onTap: (){
                     Navigator.of(super.context).push(
                       new MaterialPageRoute(
-                          builder: (BuildContext context) => new Login()),
+                          builder: (BuildContext context) => new Login(), fullscreenDialog: true),
                     );
                   },
                 ),
               ),
             ),
           ),
-          /**Gold Box */
           new Padding(
             padding: EdgeInsets.only(bottom: 25),
             child: new Row(
               children: <Widget>[
                 new GestureDetector(
+                  behavior: HitTestBehavior.translucent,
                   child: new Column(
                     children: <Widget>[
-                      Text('2', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
+                      _login ?
+                      Text(_userInfo[User.FIELD_AVERAGEREWARD].toString(), style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),)
+                      : Icon(Icons.confirmation_number, color: Colors.black54,),
                       Text('普通奖励', style: TextStyle(color: Colors.green[300], height: 1.8),),
                     ],
                   ),
+                  onTap: (){
+                    if(_login){
+                      Navigator.of(super.context).push(
+                        new MaterialPageRoute(
+                            builder: (BuildContext context) => new Wallet(type: User.FIELD_AVERAGEREWARD,)),
+                      );
+                    }else{
+                      Navigator.of(super.context).push(
+                        new MaterialPageRoute(
+                            builder: (BuildContext context) => new Login(), fullscreenDialog: true),
+                      );
+                    }
+                  },
                 ),
                 new GestureDetector(
+                  behavior: HitTestBehavior.translucent,
                   child: new Column(
                     children: <Widget>[
-                      Text('26', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
+                      _login ?
+                      Text(_userInfo[User.FIELD_PROMOTIONREWARD].toString(), style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),)
+                      : Icon(Icons.share, color: Colors.black54,),
                       Text('推广奖励', style: TextStyle(color: Colors.green[300], height: 1.8),),
                     ],
                   ),
+                  onTap: (){
+                    if(_login){
+                      Navigator.of(super.context).push(
+                        new MaterialPageRoute(
+                            builder: (BuildContext context) => new Wallet(type: User.FIELD_PROMOTIONREWARD,)),
+                      );
+                    }else{
+                      Navigator.of(super.context).push(
+                        new MaterialPageRoute(
+                            builder: (BuildContext context) => new Login(), fullscreenDialog: true),
+                      );
+                    }
+                  },
                 ),
                 new GestureDetector(
+                  behavior: HitTestBehavior.translucent,
                   child: new Column(
                     children: <Widget>[
-                      Text('18', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
+                      _login ?
+                      Text(_userInfo[User.FIELD_FROZENCREDIT].toString(), style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),)
+                      : Icon(Icons.no_sim, color: Colors.black54,),
                       Text('冻结学分', style: TextStyle(color: Colors.green[300], height: 1.8),),
                     ],
                   ),
+                  onTap: (){
+                    if(_login){
+                      Navigator.of(super.context).push(
+                        new MaterialPageRoute(
+                            builder: (BuildContext context) => new Wallet(type: User.FIELD_FROZENCREDIT,)),
+                      );
+                    }else{
+                      Navigator.of(super.context).push(
+                        new MaterialPageRoute(
+                            builder: (BuildContext context) => new Login(), fullscreenDialog: true),
+                      );
+                    }
+                  },
                 ),
               ],
               mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -177,20 +289,36 @@ class MineState extends State{
                   padding: EdgeInsets.only(top: 15, bottom: 15, left: 5, right: 8),
                 ),
                 new Divider(indent: 5, height: 0, color: Colors.grey[200]),
-                new Container(
-                  child: new Row(
-                    children: <Widget>[
-                      Row(
-                        children: <Widget>[
-                          Icon(FontAwesomeIcons.key, size: 18, color: Colors.black45,),
-                          Text('  修改密码', style: TextStyle(fontSize: 16),)
-                        ],
-                      ),
-                      Icon(Icons.chevron_right, color: Colors.grey,)
-                    ],
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                new GestureDetector(
+                  behavior: HitTestBehavior.translucent,
+                  child: new Container(
+                    child: new Row(
+                      children: <Widget>[
+                        Row(
+                          children: <Widget>[
+                            Icon(FontAwesomeIcons.key, size: 18, color: Colors.black45,),
+                            Text('  修改密码', style: TextStyle(fontSize: 16),)
+                          ],
+                        ),
+                        Icon(Icons.chevron_right, color: Colors.grey,)
+                      ],
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    ),
+                    padding: EdgeInsets.only(top: 15, bottom: 15, left: 5, right: 8),
                   ),
-                  padding: EdgeInsets.only(top: 15, bottom: 15, left: 5, right: 8),
+                  onTap: (){
+                    if(_login){
+                      Navigator.of(super.context).push(
+                        new MaterialPageRoute(
+                            builder: (BuildContext context) => new ResetPassword())
+                      );
+                    }else{
+                      Navigator.of(super.context).push(
+                        new MaterialPageRoute(
+                            builder: (BuildContext context) => new Login(), fullscreenDialog: true),
+                      );
+                    }
+                  },
                 ),
                 new Divider(indent: 5, height: 0, color: Colors.grey[200]),
                 new Container(
@@ -209,20 +337,29 @@ class MineState extends State{
                   padding: EdgeInsets.only(top: 15, bottom: 15, left: 5, right: 8),
                 ),
                 new Divider(indent: 5, height: 0, color: Colors.grey[200]),
-                new Container(
-                  child: new Row(
-                    children: <Widget>[
-                      Row(
-                        children: <Widget>[
-                          Icon(FontAwesomeIcons.cog, size: 18, color: Colors.black45,),
-                          Text('  设置', style: TextStyle(fontSize: 16),)
-                        ],
-                      ),
-                      Icon(Icons.chevron_right, color: Colors.grey,)
-                    ],
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                new GestureDetector(
+                  behavior: HitTestBehavior.translucent,
+                  child: new Container(
+                    child: new Row(
+                      children: <Widget>[
+                        Row(
+                          children: <Widget>[
+                            Icon(FontAwesomeIcons.cog, size: 18, color: Colors.black45,),
+                            Text('  设置', style: TextStyle(fontSize: 16),)
+                          ],
+                        ),
+                        Icon(Icons.chevron_right, color: Colors.grey,)
+                      ],
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    ),
+                    padding: EdgeInsets.only(top: 15, bottom: 15, left: 5, right: 8),
                   ),
-                  padding: EdgeInsets.only(top: 15, bottom: 15, left: 5, right: 8),
+                  onTap: (){
+                    Navigator.of(super.context).push(
+                      new MaterialPageRoute(
+                          builder: (BuildContext context) => new Setting())
+                    );
+                  },
                 ),
                 new Divider(indent: 5, height: 0, color: Colors.grey[200]),
               ],
@@ -233,28 +370,30 @@ class MineState extends State{
       ),
     );
 
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
+    return _loaded ? new LoadingView() : Scaffold(
         appBar: AppBar(
           elevation: 0,
           backgroundColor: Colors.green,
           actions: <Widget>[
             IconButton(
+              icon: Icon(Icons.settings, color: Colors.white,),
+              tooltip: '设置',
+              onPressed: (){
+                Navigator.of(super.context).push(
+                  new MaterialPageRoute(
+                      builder: (BuildContext context) => new Setting()),
+                );
+              },
+            ),
+            IconButton(
               icon: Icon(Icons.message, color: Colors.white,),
               tooltip: '消息',
               onPressed: null,
             ),
-            IconButton(
-              icon: Icon(Icons.settings, color: Colors.white,),
-              tooltip: '设置',
-              onPressed: null,
-            )
           ],
         ),
         body: _body,
-      ),
-    );
+      );
   }
 }
 

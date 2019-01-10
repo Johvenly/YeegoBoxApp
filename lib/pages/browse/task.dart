@@ -4,7 +4,10 @@ class BTask extends StatefulWidget{
   State<StatefulWidget> createState() => new BTaskState();
 }
 
-class BTaskState extends State with SingleTickerProviderStateMixin{
+class BTaskState extends State with SingleTickerProviderStateMixin,AutomaticKeepAliveClientMixin{
+  @override
+  bool get wantKeepAlive => true;
+
   TabController _tabController;
 
   @override
@@ -16,6 +19,13 @@ class BTaskState extends State with SingleTickerProviderStateMixin{
   void initState() {
     super.initState();
     _tabController = new TabController(vsync: this, length: 2);
+    initData();
+  }
+
+  //初始化界面数据
+  @override
+  void initData(){
+    print('BTask界面数据初始化...');
   }
   
   @override

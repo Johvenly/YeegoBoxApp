@@ -1,14 +1,21 @@
 import 'package:flutter/material.dart';
 import 'detail.dart';
+import '../../config/api.dart';
+import '../../common/user.dart';
+import '../../common/loading.dart';
 
 class RTask extends StatefulWidget{
   @override
   State<StatefulWidget> createState() => new RTaskState();
 }
 
-class RTaskState extends State with AutomaticKeepAliveClientMixin,SingleTickerProviderStateMixin{
+class RTaskState extends State with SingleTickerProviderStateMixin,AutomaticKeepAliveClientMixin{
   @override
   bool get wantKeepAlive => true;
+
+  //数据控制字段
+  bool _login = false;
+  bool _loaded = true;
 
   TabController _tabController;
 
@@ -21,6 +28,27 @@ class RTaskState extends State with AutomaticKeepAliveClientMixin,SingleTickerPr
   void initState() {
     super.initState();
     _tabController = new TabController(vsync: this, length: 2);
+    UserEvent.eventBus.on<UserEvent>().listen((_){
+      initData();
+    });
+
+    initData().then((e){
+      setState(() {
+        _loaded = false;
+      });
+    });
+  }
+
+  //初始化界面数据
+  @override
+  Future<dynamic> initData() async{
+    User.isLogin().then((verify){
+      //改变登录状态标识
+      setState(() {
+        _login = verify;
+      });
+    });
+    print('RTask界面数据初始化...');
   }
 
   // 任务列表
@@ -44,6 +72,52 @@ class RTaskState extends State with AutomaticKeepAliveClientMixin,SingleTickerPr
   
   @override
   Widget build(BuildContext context){
+    Widget _body = new Container(
+      child: new TabBarView(
+        controller: _tabController,
+        children: <Widget>[
+          // 任务列表View
+          new TaskListView(datalist: _taskList,),
+          new TaskListView(datalist: _rowList,),
+        ],
+      ),
+    );
+
+    return _loaded ? new LoadingView() : Scaffold(
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.green,
+        title: Text('试客任务'),
+        bottom: _login ? new TabBar(
+          controller: _tabController,
+          indicatorColor: Colors.white,
+          tabs: <Widget>[
+            Tab(text: '任务',),
+            Tab(text: '记录',),
+          ],
+        ) : null,
+      ),
+      body: _login ? _body : LoadingView.finished(title: '您当前未登录！'),
+    );
+  }
+}
+
+
+//任务列表显示控件
+class TaskListView extends StatefulWidget{
+  final List datalist;
+  TaskListView({Key key, this.datalist}): super(key: key);
+
+  @override
+  State<StatefulWidget> createState() => new TaskListViewState();
+}
+
+class TaskListViewState extends State<TaskListView> with AutomaticKeepAliveClientMixin{
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  Widget build(BuildContext context){
     Widget _li(Map row){
       return new GestureDetector(
         child: new Container(
@@ -59,7 +133,14 @@ class RTaskState extends State with AutomaticKeepAliveClientMixin,SingleTickerPr
                 child: new Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    Text('学分' + row['score'].toString()),
+                    Container(
+                      padding: EdgeInsets.only(left: 15, right: 15),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.green[100]),
+                        borderRadius: BorderRadius.all(Radius.circular(20))
+                      ),
+                      child: Text('积分 ' + row['score'].toString(), style: TextStyle(color: Colors.green[100]),),
+                    ),
                     Text(row['time'], style: TextStyle(color: Colors.grey),),
                   ],
                 ),
@@ -113,46 +194,18 @@ class RTaskState extends State with AutomaticKeepAliveClientMixin,SingleTickerPr
         },
       );
     }
-    Widget _body = new Container(
-      child: new TabBarView(
-        controller: _tabController,
-        children: <Widget>[
-          // 任务列表View
-          new ListView.builder(
-            padding: EdgeInsets.only(top: 8),
-            itemCount: _taskList.length,
-            itemBuilder: (BuildContext context, int index){
-              return _li(_taskList[index]);
-            },
-          ),
-          new ListView.builder(
-            padding: EdgeInsets.only(top: 8),
-            itemCount: _taskList.length,
-            itemBuilder: (BuildContext context, int index){
-              return _li(_rowList[index]);
-            },
-          ),
-        ],
-      ),
-    );
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        appBar: AppBar(
-          elevation: 0,
-          backgroundColor: Colors.green,
-          title: Text('试客任务'),
-          bottom: new TabBar(
-            controller: _tabController,
-            indicatorColor: Colors.white,
-            tabs: <Widget>[
-              Tab(text: '任务',),
-              Tab(text: '记录',),
-            ],
-          ),
-        ),
-        body: _body,
-      ),
+
+    // 任务列表View
+    return (widget.datalist.length > 0) ? 
+    new ListView.builder(
+      padding: EdgeInsets.only(top: 8),
+      itemCount: widget.datalist.length,
+      itemBuilder: (BuildContext context, int index){
+        return _li(widget.datalist[index]);
+      },
+    ) : 
+    new Center(
+      child: Text('无数据'),
     );
   }
 }
