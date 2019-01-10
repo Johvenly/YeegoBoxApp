@@ -23,7 +23,6 @@ class BTaskState extends State with SingleTickerProviderStateMixin,AutomaticKeep
   }
 
   //初始化界面数据
-  @override
   void initData(){
     print('BTask界面数据初始化...');
   }

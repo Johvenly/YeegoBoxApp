@@ -10,7 +10,6 @@ class Index extends StatefulWidget {
 }
 
 class IndexState extends State<Index>{
-  @override
   int _currentIndex = 0;            //当前页面索引
   PageController _pageController = new PageController(initialPage: 0);
   var _pageList = <StatefulWidget>[

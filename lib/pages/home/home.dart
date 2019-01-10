@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import '../../config/api.dart';
+import 'notice/notice.dart';
 
 class Home extends StatefulWidget{
   @override
@@ -22,9 +23,8 @@ class HomeState extends State{
     }
 
   //初始化界面数据
-  @override
   Future<dynamic> initData() async{
-    await print('Home界面数据初始化...');
+    print('Home界面数据初始化...');
   }
   
   @override
@@ -266,7 +266,10 @@ class HomeState extends State{
             IconButton(
               icon: Icon(Icons.message, color: Colors.white, size: 25),
               onPressed: (){
-
+                Navigator.of(super.context).push(
+                  new MaterialPageRoute(
+                      builder: (BuildContext context) => new Notice()),
+                );
               },
             ),
           ],

@@ -11,11 +11,11 @@ class API{
   // 接口状态调试
   static const String status = apiurl + r'/auth/index.html';
 
-  // 获取公告列表
-  static const String getNoticeList = apiurl + r'';
+  // 获取公告列表，必须参数：page(int)
+  static const String getNoticeList = apiurl + r'/notice/index.html';
 
   // 获取公告详情，必须参数：id(int)
-  static const String getNoticeDetail = apiurl + r'';
+  static const String getNoticeDetail = apiurl + r'/notice/detail.html';
 
   // 会员登录接口，必须参数：username(String),password(String)
   static const String login = apiurl + r'/auth/login.html';

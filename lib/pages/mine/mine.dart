@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../auth/login.dart';
@@ -36,7 +38,6 @@ class MineState extends State with AutomaticKeepAliveClientMixin{
     }
 
   //初始化界面数据
-  @override
   Future<dynamic> initData() async{
     User.isLogin().then((verify){
       if(verify){

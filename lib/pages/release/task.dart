@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'detail.dart';
 import '../../config/api.dart';
@@ -40,7 +42,6 @@ class RTaskState extends State with SingleTickerProviderStateMixin,AutomaticKeep
   }
 
   //初始化界面数据
-  @override
   Future<dynamic> initData() async{
     User.isLogin().then((verify){
       //改变登录状态标识

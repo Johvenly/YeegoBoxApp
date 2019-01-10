@@ -28,7 +28,6 @@ class ResetPasswordState extends State{
     }
 
   //初始化界面数据
-  @override
   Future<dynamic> initData() async{
     User.getAccountToken().then((result){
       setState(() {
