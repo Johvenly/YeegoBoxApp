@@ -18,11 +18,19 @@ class LoadingView extends StatelessWidget{
     );
   }
 
-  static Widget finished({title = '数据已加载完成'}){
+  static Widget finished({String title = '数据已加载完成', Widget icon}){
+    icon = (icon == null) ? new Container() : icon;
     return new Center(
-      child: Padding(
-        padding: EdgeInsets.only(top: 15, bottom: 15),
-        child: Text(title, style: TextStyle(color: Colors.black54, fontSize: 16.0),),
+      child: new Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          icon,
+          new Padding(
+            padding: EdgeInsets.only(top: 15, bottom: 15),
+            child: Text(title, style: TextStyle(color: Colors.black54, fontSize: 16.0),),
+          )
+        ],
       ),
     );
   }

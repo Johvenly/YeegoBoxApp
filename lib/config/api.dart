@@ -3,7 +3,7 @@
 
 class API{
   //站点资源根目录
-  static const String host = r'http://www.yeegobox.com';
+  static const String host = r'http://www.yeegobox.cn';
 
   // 接口根url
   static const String apiurl = r'http://api.yeegobox.com';

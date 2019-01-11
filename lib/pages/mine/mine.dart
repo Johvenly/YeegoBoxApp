@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../auth/login.dart';
 import '../../config/api.dart';
 import '../../common/user.dart';
@@ -79,7 +80,8 @@ class MineState extends State with AutomaticKeepAliveClientMixin{
                 child: _login ? new GestureDetector(
                   child: new Column(
                     children: <Widget>[
-                      new CircleAvatar(backgroundColor: Colors.green ,backgroundImage: (_userInfo[User.FIELD_AVATAR] != null) ? NetworkImage(API.host + _userInfo[User.FIELD_AVATAR]) : new AssetImage('assets/images/avatar.jpg'), radius: 50),
+                      new CircleAvatar(backgroundColor: Colors.green ,backgroundImage: (_userInfo[User.FIELD_AVATAR] != null) ? new CachedNetworkImageProvider(API.host + _userInfo[User.FIELD_AVATAR])
+                           : new AssetImage('assets/images/avatar.jpg'), radius: 50),
                       new Container(
                         child: Text(_userInfo[User.FIELD_MOBILE], style: TextStyle(color: Colors.white, fontSize: 16, height: 1.5),),
                         margin: EdgeInsets.only(top: 8),
@@ -370,7 +372,7 @@ class MineState extends State with AutomaticKeepAliveClientMixin{
         ],
       ),
     );
-
+    
     return _loaded ? new LoadingView() : Scaffold(
         appBar: AppBar(
           elevation: 0,

@@ -3,6 +3,7 @@ import '../../../config/api.dart';
 import '../../../common/http.dart';
 import '../../../common/loading.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'detail.dart';
 
 class Notice extends StatefulWidget{
   State<StatefulWidget> createState() => new NoticeState();
@@ -11,6 +12,7 @@ class Notice extends StatefulWidget{
 class NoticeState extends State{
   //数据控制字段
   bool _loaded = false;              //界面初始化数据加载控制
+  Widget _assWidget = new LoadingView();          //主Body显示前的Widget
 
   //列表要展示的数据
   List list = new List();
@@ -22,16 +24,19 @@ class NoticeState extends State{
   @override
     void initState() {
       super.initState();
-      initData().then((_){
+      initData().then((_) async {
         setState(() {
-          _loaded = true;
+          if(list.length > 0){
+            _loaded = true;
+          }else{
+            _assWidget = LoadingView.finished(title: '无有效数据', icon: new Icon(Icons.cloud_off, size: 80, color: Colors.grey,));
+          }
         });
       });
 
       // 上拉动作监听
       _scrollController.addListener(() {
-        if (_scrollController.position.pixels ==
-           _scrollController.position.maxScrollExtent) {
+        if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent) {
           print('滑动到了最底部');
           _getMore();
         }
@@ -46,7 +51,7 @@ class NoticeState extends State{
 
   //初始化界面数据
   Future<dynamic> initData() async{
-    _getData(page: 1);
+    await _getData(page: 1);
     print('Notice界面数据初始化...');
   }
 
@@ -77,7 +82,7 @@ class NoticeState extends State{
 
   // 获取/加载远程数据
   Future _getData({page = 1}) async {
-    Http.post(API.getNoticeList, data: {'page': page}).then((result){
+    await Http.post(API.getNoticeList, data: {'page': page}).then((result){
       if(result['code'] == 1){
         setState(() {
           _page = page + 1;
@@ -97,6 +102,8 @@ class NoticeState extends State{
         setState(() {
           isStop = true;
         });
+        Fluttertoast.showToast(msg: result['msg'], gravity: ToastGravity.CENTER);
+        return;
       }
     });
   }
@@ -108,7 +115,7 @@ class NoticeState extends State{
       return new Column(
         children: <Widget>[
           ListTile(
-            title: Text(list[index]['name'] , maxLines: 1, overflow: TextOverflow.ellipsis,),
+            title: Text(list[index]['name'], maxLines: 1, overflow: TextOverflow.ellipsis,),
             subtitle: new Padding(
               padding: EdgeInsets.only(top: 15),
               child: new Row(
@@ -121,14 +128,17 @@ class NoticeState extends State{
               ),
             ),
             onTap: (){
-              print('点击了$index个列表');
+              Navigator.of(super.context).push(
+                new MaterialPageRoute(
+                    builder: (BuildContext context) => new NoticeDetail(id: list[index]['id'])),
+              );
             },
           ),
           new Divider(indent: 15, color: Colors.grey[300],),
         ],
       );
     }
-    return isStop ? LoadingView.finished(title: '我也是有底线的') : LoadingView.more();
+    return isStop ? LoadingView.finished(title: '--- 我也是有底线的 ---') : LoadingView.more();
   }
 
   @override
@@ -147,7 +157,7 @@ class NoticeState extends State{
             },
           ),
         ),
-        body: !_loaded ? new LoadingView() : RefreshIndicator(
+        body: !_loaded ? _assWidget : RefreshIndicator(
           color: Colors.white,
           backgroundColor: Colors.green,
           onRefresh: _onRefresh,
