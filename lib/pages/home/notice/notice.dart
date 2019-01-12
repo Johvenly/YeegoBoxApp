@@ -1,113 +1,135 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import '../../../config/api.dart';
 import '../../../common/http.dart';
 import '../../../common/loading.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'detail.dart';
 
-class Notice extends StatefulWidget{
-  State<StatefulWidget> createState() => new NoticeState();
+class Notice extends StatefulWidget {
+  @override
+  _NoticeState createState() => new _NoticeState();
 }
 
-class NoticeState extends State{
-  //数据控制字段
-  bool _loaded = false;              //界面初始化数据加载控制
-  Widget _assWidget = new LoadingView();          //主Body显示前的Widget
+class _NoticeState extends State<Notice> with TickerProviderStateMixin {
+  RefreshController _controller;
 
-  //列表要展示的数据
-  List list = new List();
-  ScrollController _scrollController = ScrollController(); //listview的控制器
-  int _page = 1; //加载的页数
-  bool isLoading = false; //是否正在加载数据
-  bool isStop = false; //是否已停止加载数据（无更多数据）
+  // 数据控制字段
+  bool _loaded = false;                                 //界面初始化数据加载控制
+  List list = new List();                               //列表数据
+  int _page = 2;                                        //加载的页数
+  bool _noMore = false;                                 //是否已停止加载数据（无更多数据）
 
   @override
-    void initState() {
-      super.initState();
-      initData().then((_) async {
-        setState(() {
-          if(list.length > 0){
-            _loaded = true;
-          }else{
-            _assWidget = LoadingView.finished(title: '无有效数据', icon: new Icon(Icons.cloud_off, size: 80, color: Colors.grey,));
-          }
-        });
-      });
-
-      // 上拉动作监听
-      _scrollController.addListener(() {
-        if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent) {
-          print('滑动到了最底部');
-          _getMore();
-        }
-      });
-    }
-
-  @override
-  void dispose() {
-    super.dispose();
-    _scrollController.dispose();
+  void initState() {
+    super.initState();
+    initData();
+    _controller = new RefreshController();
   }
 
   //初始化界面数据
   Future<dynamic> initData() async{
-    await _getData(page: 1);
+    _fetch(page: 1).then((_){
+      setState(() {
+        _loaded = true;
+      });
+    });
     print('Notice界面数据初始化...');
   }
 
-  // 下拉刷新数据
-  Future<dynamic> _onRefresh() async{
-    if (!isLoading) {
-      setState(() {
-        isStop = false;
-        isLoading = true;
-      });
-      _getData(page: 1).then((_){
-        Fluttertoast.showToast(msg: '已重新刷新数据', gravity: ToastGravity.CENTER, backgroundColor: Colors.black54);
-      });
-    }
-    print('Notice正在刷新数据...');
-  }
-
-  // 上拉获取/加载数据
-  Future _getMore() async {
-    if (!isLoading && !isStop) {
-      setState(() {
-        isLoading = true;
-      });
-      _getData(page: _page);
-    }
-    print('Notice正在加载更多数据...');
-  }
-
-  // 获取/加载远程数据
-  Future _getData({page = 1}) async {
-    await Http.post(API.getNoticeList, data: {'page': page}).then((result){
+  // 加载数据函数
+  Future _fetch({page = 1}) async {
+    return Http.post(API.getNoticeList, data: {'page': page}).then((result){
       if(result['code'] == 1){
         setState(() {
-          _page = page + 1;
-          isLoading = false;
-          if(page == 1){
-            list = result['data'];
-          }else{
-            list.addAll(result['data']);
+          _page = page + 1;                                 //有数据时增加页数
+          list.addAll(result['data']);
+
+          // 判断是否无更多数据
+          if(result['data'].length < result['pageach']){
+            _noMore = true;
           }
         });
-        if(result['data'].length < result['pageach']){
-          setState(() {
-            isStop = true;
-          });
-        }
+        return true;
       }else{
-        setState(() {
-          isStop = true;
-        });
         Fluttertoast.showToast(msg: result['msg'], gravity: ToastGravity.CENTER);
-        return;
+        return false;
       }
     });
   }
 
+  //刷新加载数据
+  void _onRefresh(bool up) {
+    if (up){
+      list.clear();
+      _noMore = false;
+      _controller.sendBack(false, RefreshStatus.canRefresh);
+
+      new Future.delayed(const Duration(milliseconds: 2009)).then((val) {
+        _fetch(page: 1).then((_){
+          if(_){
+            _controller.sendBack(true, RefreshStatus.completed);
+          }else{
+            _controller.sendBack(true, RefreshStatus.failed);
+          }
+        });
+      });
+      print("下拉刷新列表...");
+    }else {
+      if(_noMore){
+        _controller.sendBack(false, RefreshStatus.noMore);
+        return;
+      }
+
+      new Future.delayed(const Duration(milliseconds: 1000)).then((val) {
+        _fetch(page: _page).then((_){
+          if(_){
+            _controller.sendBack(false, RefreshStatus.completed);
+          }else{
+            _controller.sendBack(false, RefreshStatus.failed);
+          }
+        });
+      });
+      print("上拉加载更多...");
+    }
+  }
+
+  // 头部指示器构造
+  Widget _headerCreate(BuildContext context, int mode) {
+    return new Container(
+      decoration: BoxDecoration(
+        border: Border(bottom: BorderSide(color: Colors.grey[200]))
+      ),
+      child: ClassicIndicator(
+        mode: mode,
+        refreshingIcon: SpinKitFadingCube(color: Colors.green, size: 30,),
+        refreshingText: '一大波数据正在赶来...',
+        idleText: '下拉刷新列表...',
+        releaseText: '放开开始刷新...',
+        failedText: '刷新数据失败',
+        completeText: '完成更新列表',
+      ),
+    );
+  }
+
+  // 尾部指示器构造
+  Widget _footerCreate(BuildContext context, int mode) {
+    return new ClassicIndicator(
+      mode: mode,
+      refreshingIcon: SpinKitFadingCube(color: Colors.green, size: 30,),
+      refreshingText: '一大波数据正在赶来...',
+      idleIcon: const Icon(Icons.arrow_upward),
+      idleText: '上拉加载更多...',
+      releaseIcon: Icon(Icons.arrow_downward),
+      releaseText: '放开开始加载...',
+      completeText: '完成加载列表',
+      failedText: '加载数据失败',
+      noDataText: '----- 我也是有底线的 -----',
+      noMoreIcon: new Container()
+    );
+  }
 
   // 列表单条记录Widget
   Widget _renderRow(BuildContext context, int index) {
@@ -138,10 +160,8 @@ class NoticeState extends State{
         ],
       );
     }
-    return isStop ? LoadingView.finished(title: '--- 我也是有底线的 ---') : LoadingView.more();
   }
 
-  @override
   Widget build(BuildContext context){
     return MaterialApp(
       debugShowCheckedModeBanner: false,
@@ -157,17 +177,20 @@ class NoticeState extends State{
             },
           ),
         ),
-        body: !_loaded ? _assWidget : RefreshIndicator(
-          color: Colors.white,
-          backgroundColor: Colors.green,
+        body: !_loaded ? new LoadingView() : new SmartRefresher(
+          enablePullDown: true,
+          enablePullUp: true,
+          controller: _controller,
           onRefresh: _onRefresh,
-          child: ListView.builder(
+          headerBuilder: _headerCreate,
+          footerBuilder: _footerCreate,
+          footerConfig: new RefreshConfig(),
+          child: new ListView.builder(
             padding: EdgeInsets.only(top: 8),
             itemBuilder: _renderRow,
-            itemCount: list.length + 1,
-            controller: _scrollController,
+            itemCount: list.length,
           ),
-        ),
+      ),
       ),
     );
   }
