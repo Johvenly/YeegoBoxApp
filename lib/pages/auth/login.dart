@@ -14,6 +14,11 @@ class LoginState extends State<Login>{
   TextEditingController _usernameController = new TextEditingController();
   TextEditingController _passwordController = new TextEditingController();
 
+  @override void dispose() {
+      super.dispose();
+      print('Login销毁了状态');
+    }
+
   @override
   Widget build(BuildContext context){
 
@@ -21,7 +26,9 @@ class LoginState extends State<Login>{
       Http.post(API.login, data: {'username': _usernameController.text, 'password': _passwordController.text}).then((result){
         if(result['code'] == 1){
           User.saveUserInfo(result['data']);
-          UserEvent.eventBus.fire(new UserEvent());
+          try{
+            UserEvent.eventBus.fire(new UserEvent());
+          }catch(e){}
           Fluttertoast.showToast(msg: '登录成功', gravity: ToastGravity.CENTER).then((e){
             Navigator.of(super.context).pop();
           });

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'pages/index.dart';
-// import 'product/detail.dart';
+import 'pages/splash_screen.dart';
 
 void main() => runApp(new MainPage());
 
@@ -9,7 +8,7 @@ class MainPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return new MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: new Index(),
+      home: new SplashScreen(),
     );
   }
 }

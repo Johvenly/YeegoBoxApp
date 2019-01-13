@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import '../../config/api.dart';
+import '../../common/http.dart';
+import '../../common/loading.dart';
 import 'notice/notice.dart';
+import 'notice/detail.dart';
 
 class Home extends StatefulWidget{
   @override
@@ -10,35 +13,41 @@ class Home extends StatefulWidget{
 }
 
 class HomeState extends State{
-  // @override
-  // bool get wantKeepAlive => true;
 
-  //初始化控件状态
-  @override
-    void initState() {
-      super.initState();
-      initData().then((e){
-        
-      });
-    }
-
-  //初始化界面数据
-  Future<dynamic> initData() async{
-    print('Home界面数据初始化...');
-  }
-  
-  @override
-  Widget build(BuildContext context){
+    // 定义数据控制字段
+    bool _loaded = false; 
     List _slides = <Widget>[
       Image.asset('assets/images/slide01.jpg', fit: BoxFit.cover,),
       Image.asset('assets/images/slide03.jpg', fit: BoxFit.cover,),
       Image.asset('assets/images/slide04.jpg', fit: BoxFit.cover,),
     ];
-    List <Map>_notices = <Map>[
-      {'id':1, 'title': '测试消息1', 'time': '2018.12.28'},
-      {'id':2, 'title': '测试消息2', 'time': '2018.12.29'},
-      {'id':3, 'title': '测试消息3', 'time': '2018.12.30'},
-    ];
+    List _notices = new List();
+
+  //初始化控件状态
+  @override
+    void initState() {
+      super.initState();
+      initData().then((_){
+        setState(() {
+          _loaded = true;
+        });
+      });
+    }
+
+  //初始化界面数据
+  Future<dynamic> initData() async{
+    await Http.post(API.getNoticeList, data: {'pageach': 3}).then((result){
+      if(result['code'] == 1){
+        setState(() {
+          _notices = result['data'];
+        });
+      }
+    });
+    print('Home界面数据初始化...');
+  }
+  
+  @override
+  Widget build(BuildContext context){
     Widget _body = new Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -99,20 +108,28 @@ class HomeState extends State{
                     width: MediaQuery.of(context).size.width - 70,
                     height: 50,
                     child: Swiper.children(
-                      children: _notices.map<Widget>((Map row){
-                        return new Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            Expanded(
-                              child: Text(row['title']),
-                            ),
-                            Text(row['time'], style: TextStyle(color: Colors.grey),),
-                          ],
+                      children: _notices.map<Widget>((row){
+                        return new GestureDetector(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              Expanded(
+                                child: Text(row['name'] ?? ''),
+                              ),
+                              Text(row['createtime'] ?? '', style: TextStyle(color: Colors.grey),),
+                            ],
+                          ),
+                          onTap: (){
+                            Navigator.of(context).push(
+                              new MaterialPageRoute(
+                                  builder: (BuildContext context) => new NoticeDetail(id: row['id'])),
+                            );
+                          },
                         );
                       }).toList(),
                       scrollDirection: Axis.vertical,
+                      control: null,
                       autoplay: true,
-                      onTap: (index) => print('点击了第$index个'),
                     ),
                   ),
                 ],
@@ -274,7 +291,7 @@ class HomeState extends State{
             ),
           ],
         ),
-        body: _body,
+        body: !_loaded ? new LoadingView() : _body,
       ),
     );
   }

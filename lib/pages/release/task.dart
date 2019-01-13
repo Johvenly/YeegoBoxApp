@@ -11,7 +11,7 @@ class RTask extends StatefulWidget{
   State<StatefulWidget> createState() => new RTaskState();
 }
 
-class RTaskState extends State with SingleTickerProviderStateMixin,AutomaticKeepAliveClientMixin{
+class RTaskState extends State<RTask> with SingleTickerProviderStateMixin,AutomaticKeepAliveClientMixin{
   @override
   bool get wantKeepAlive => true;
 
@@ -25,13 +25,16 @@ class RTaskState extends State with SingleTickerProviderStateMixin,AutomaticKeep
   void dispose() {
     _tabController.dispose();
     super.dispose();
+    print('RTask回收了状态');
   }
 
   void initState() {
     super.initState();
     _tabController = new TabController(vsync: this, length: 2);
     UserEvent.eventBus.on<UserEvent>().listen((_){
-      initData();
+      // try{
+      //   initData();
+      // }catch(e){}
     });
 
     initData().then((e){
@@ -39,6 +42,7 @@ class RTaskState extends State with SingleTickerProviderStateMixin,AutomaticKeep
         _loaded = false;
       });
     });
+    print('RTask初始化状态');
   }
 
   //初始化界面数据

@@ -28,7 +28,9 @@ class MineState extends State with AutomaticKeepAliveClientMixin{
     void initState() {
       super.initState();
       UserEvent.eventBus.on<UserEvent>().listen((_){
-        initData();
+        try{
+          initData();
+        }catch(e){}
       });
 
       initData().then((e){
@@ -37,6 +39,12 @@ class MineState extends State with AutomaticKeepAliveClientMixin{
         });
       });
     }
+
+  @override
+  void dispose() {
+    super.dispose();
+    print('Mine回收了状态');
+  }
 
   //初始化界面数据
   Future<dynamic> initData() async{

@@ -165,6 +165,10 @@ class _NoticeState extends State<Notice> with TickerProviderStateMixin {
   Widget build(BuildContext context){
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        splashColor: Colors.transparent,
+        highlightColor: Colors.transparent,
+      ),
       home: Scaffold(
         appBar: AppBar(
           elevation: 0,

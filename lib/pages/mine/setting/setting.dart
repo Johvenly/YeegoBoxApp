@@ -26,7 +26,9 @@ class SettingState extends State{
                 User.isLogin().then((verify){
                   if(verify){
                     User.delAccountToken();
-                    UserEvent.eventBus.fire(new UserEvent());
+                    try{
+                      UserEvent.eventBus.fire(new UserEvent());
+                    }catch(e){}
                     Fluttertoast.showToast(msg: '已退出登录！', gravity: ToastGravity.CENTER).then((e){
                       Navigator.of(super.context).pop();
                     });
