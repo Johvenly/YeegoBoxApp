@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import '../../config/api.dart';
+import '../../common/user.dart';
 import '../../common/http.dart';
 import '../../common/loading.dart';
 import 'notice/notice.dart';
 import 'notice/detail.dart';
+import '../auth/login.dart';
 
 class Home extends StatefulWidget{
   @override
@@ -21,7 +24,16 @@ class HomeState extends State{
       Image.asset('assets/images/slide03.jpg', fit: BoxFit.cover,),
       Image.asset('assets/images/slide04.jpg', fit: BoxFit.cover,),
     ];
-    List _notices = new List();
+    List _notices = new List();             //公告列表数据
+    List _releaseList = [
+      {'classid': 1, 'pic': 'assets/images/logo_tb.jpg', 'stock': 0},
+      {'classid': 2, 'pic': 'assets/images/logo_jd.jpg', 'stock': 0},
+      {'classid': 5, 'pic': 'assets/images/logo_pdd.jpg', 'stock': 0},
+    ];
+    int _releaseSelectClassID = 1;          //当前选择使用任务平台ID
+    Map _userinfo = new Map();              //用户信息
+    String _token;                          //登录Token
+    TextEditingController _priceController = new TextEditingController();
 
   //初始化控件状态
   @override
@@ -40,6 +52,34 @@ class HomeState extends State{
       if(result['code'] == 1){
         setState(() {
           _notices = result['data'];
+        });
+      }
+    });
+    await User.isLogin().then((_){
+      if(_){
+        User.getAccountToken().then((token) async{
+          await Http.post(API.initUser, data: {'account_token': token}).then((result){
+            if(result['code'] == 1){
+              setState(() {
+                _userinfo = result['data'];
+                _token = result['data']['token'];
+              });
+            }else{
+              Fluttertoast.showToast(msg: '您已在其他地方登录或账号已过期', gravity: ToastGravity.CENTER);
+              User.delAccountToken();
+            }
+          });
+          Http.post(API.getReleaseCount, data: {'account_token': token}).then((result){
+            if(result['code'] == 1){
+              setState(() {
+                _releaseList.map((row){
+                  int index = _releaseList.indexOf(row);
+                  _releaseList[index]['stock'] = row[_releaseList[index]['classid']];
+                });
+              });
+              print(result);
+            }
+          });
         });
       }
     });
@@ -80,13 +120,17 @@ class HomeState extends State{
                   mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    Text('12', style: TextStyle(fontSize: 20,),),
+                    _token != null ?
+                    Text(_userinfo['release'].toString(), style: TextStyle(fontSize: 20,),) :
+                    Icon(Icons.insert_drive_file, color: Colors.black54,),
                     Text('试用报告', style: TextStyle(height: 1.5),),
                   ],
                 ),
                 Column(
                   children: <Widget>[
-                    Text('15', style: TextStyle(fontSize: 20,),),
+                    _token != null ?
+                    Text(_userinfo['apply'].toString(), style: TextStyle(fontSize: 20,),) :
+                    Icon(Icons.group, color: Colors.black54,),
                     Text('邀请好友', style: TextStyle(height: 1.5),),
                   ],
                 ),
@@ -114,7 +158,7 @@ class HomeState extends State{
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: <Widget>[
                               Expanded(
-                                child: Text(row['name'] ?? ''),
+                                child: Text(row['name'] ?? '', maxLines: 1, overflow: TextOverflow.ellipsis,),
                               ),
                               Text(row['createtime'] ?? '', style: TextStyle(color: Colors.grey),),
                             ],
@@ -150,54 +194,38 @@ class HomeState extends State{
             padding: EdgeInsets.only(left: 15, right: 15),
             child: new ButtonBar(
               alignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Column(
+              children: _releaseList.map<Widget>((row){
+                return Column(
                   mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     ClipRRect(
                       borderRadius: BorderRadius.all(Radius.circular(15)),
-                      child: IconButton(
-                        icon: Image.asset('assets/images/logo_tb.jpg', fit: BoxFit.cover,),
-                        iconSize:80, 
-                        padding: EdgeInsets.all(0),
+                      child: new Opacity(
+                        opacity: (_releaseSelectClassID == row['classid']) ? 1 : .2,
+                        child: IconButton(
+                          icon: Image.asset(row['pic'], fit: BoxFit.cover,),
+                          iconSize:80, 
+                          padding: EdgeInsets.all(0),
+                          onPressed: (){
+                            setState(() {
+                              _releaseSelectClassID = row['classid'];                          
+                            });
+                          },
+                        ),
                       ),
                     ),
-                    Text('机会：8', style: TextStyle(height: 2),),
+                    Text('机会：'+row['stock'].toString(), style: TextStyle(height: 2),),
                   ],
-                ),
-                Column(
-                  children: <Widget>[
-                    ClipRRect(
-                      borderRadius: BorderRadius.all(Radius.circular(15)),
-                      child: IconButton(
-                        icon: Image.asset('assets/images/logo_jd.jpg', fit: BoxFit.cover,),
-                        iconSize:80, 
-                        padding: EdgeInsets.all(0),
-                      ),
-                    ),
-                    Text('机会：10', style: TextStyle(height: 2),),
-                  ],
-                ),
-                Column(
-                  children: <Widget>[
-                    ClipRRect(
-                      borderRadius: BorderRadius.all(Radius.circular(15)),
-                      child: IconButton(
-                        icon: Image.asset('assets/images/logo_pdd.jpg', fit: BoxFit.cover,),
-                        iconSize:80, 
-                        padding: EdgeInsets.all(0),
-                      ),
-                    ),
-                    Text('机会：5', style: TextStyle(height: 2),),
-                  ],
-                ),
-              ],
+                );
+              }).toList(),
             ),
           ),
+          (_releaseSelectClassID != 5) ?
           new Padding(
             padding: EdgeInsets.only(left: 25, right: 25, bottom: 8),
             child: new TextField(
+              controller: _priceController,
               decoration: InputDecoration(
                 contentPadding: EdgeInsets.only(top: 15, bottom: 15, left: 15, right: 15),
                 hintText: '输入您能垫付的最大金额',
@@ -211,7 +239,7 @@ class HomeState extends State{
               // autofocus: true,
               focusNode: FocusNode(),
             ),
-          ),
+          ) : new Container(),
           new Padding(
             padding: EdgeInsets.only(top: 15, bottom: 15, left: 25, right: 25),
               child: new FlatButton(
@@ -222,8 +250,17 @@ class HomeState extends State{
                   borderRadius: BorderRadius.all(Radius.circular(8)),
                 ),
                 onPressed: () {
-                  // _postLogin(
-                  //     _userNameController.text, _userPassController.text);
+                  if(_token == null){
+                    Navigator.of(super.context).push(
+                      new MaterialPageRoute(
+                          builder: (BuildContext context) => new Login(), fullscreenDialog: true),
+                    );
+                    return;
+                  }
+                  if((_priceController.text == '' || double.parse(_priceController.text) <= 0) && _releaseSelectClassID != 5){
+                    return;
+                  }
+                  print(_priceController.text + '-' + _releaseSelectClassID.toString());
                 },
                 child: Text('接受任务', style: new TextStyle(color: Colors.white, fontSize: 16.0),
               )

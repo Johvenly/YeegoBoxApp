@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 class LoadingView extends StatelessWidget{
   final String title;
-  LoadingView({Key key, this.title = '数据拼命加载中...'});
+  LoadingView({Key key, this.title = '精彩即将呈现'});
 
   @override
   Widget build(BuildContext context){
@@ -11,7 +11,7 @@ class LoadingView extends StatelessWidget{
       child: new Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          SpinKitFadingCube(color: Colors.green, size: 38,),
+          SpinKitChasingDots(color: Colors.green, size: 38,),
           Text(title, style: TextStyle(height: 3, color: Colors.black54, fontSize: 16.0),)
         ],
       ),
@@ -44,7 +44,7 @@ class LoadingView extends StatelessWidget{
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            Padding(padding: EdgeInsets.only(left: 12, right: 12), child: SpinKitFadingCube(color: Colors.green, size: 18,),),
+            Padding(padding: EdgeInsets.only(left: 12, right: 12), child: SpinKitCircle(color: Colors.green, size: 16,),),
             Text(title, style: TextStyle(fontSize: 16.0, color: Colors.black54),),
           ],
         ),

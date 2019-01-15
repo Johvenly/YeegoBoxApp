@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -7,6 +6,7 @@ import '../auth/login.dart';
 import '../../config/api.dart';
 import '../../common/user.dart';
 import '../../common/loading.dart';
+import '../home/notice/notice.dart';
 import 'setting/setting.dart';
 import 'resetpassword/resetpassword.dart';
 import 'wallet/wallet.dart';
@@ -399,7 +399,12 @@ class MineState extends State with AutomaticKeepAliveClientMixin{
             IconButton(
               icon: Icon(Icons.message, color: Colors.white,),
               tooltip: '消息',
-              onPressed: null,
+              onPressed: (){
+                Navigator.of(super.context).push(
+                  new MaterialPageRoute(
+                      builder: (BuildContext context) => new Notice()),
+                );
+              },
             ),
           ],
         ),

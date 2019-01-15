@@ -25,4 +25,16 @@ class API{
 
   // 会员修改密码接口
   static const String updatePassword = apiurl + r'/user/updatePassword.html';
+
+  // 试用任务数量接口，必须参数：account_token(String)，
+  static const String getReleaseCount = apiurl + r'/release/count.html';
+
+  // 试用任务列表接口，必须参数：account_token(String)，
+  static const String getReleaseList = apiurl + r'/release/index.html';
+
+  // 获取试用任务接口，必须参数：classid(int),account_token(String)，可选参数：price(int)
+  static const String getRelease = apiurl + r'/release/get.html';
+
+  // 试用任务详情接口，必须参数：id(int),account_token(String)
+  static const String getReleaseDetail = apiurl + r'/release/detail.html';
 }

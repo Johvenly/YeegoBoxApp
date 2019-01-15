@@ -104,7 +104,9 @@ class _NoticeState extends State<Notice> with TickerProviderStateMixin {
       ),
       child: ClassicIndicator(
         mode: mode,
-        refreshingIcon: SpinKitFadingCube(color: Colors.green, size: 30,),
+        height: 50,
+        spacing: 8,
+        refreshingIcon: SpinKitRing(color: Colors.green, size: 20, lineWidth: 2.0,),
         refreshingText: '一大波数据正在赶来...',
         idleText: '下拉刷新列表...',
         releaseText: '放开开始刷新...',
@@ -118,7 +120,9 @@ class _NoticeState extends State<Notice> with TickerProviderStateMixin {
   Widget _footerCreate(BuildContext context, int mode) {
     return new ClassicIndicator(
       mode: mode,
-      refreshingIcon: SpinKitFadingCube(color: Colors.green, size: 30,),
+      height: 50,
+      spacing: 8,
+      refreshingIcon: SpinKitRing(color: Colors.green, size: 20, lineWidth: 2.0,),
       refreshingText: '一大波数据正在赶来...',
       idleIcon: const Icon(Icons.arrow_upward),
       idleText: '上拉加载更多...',
