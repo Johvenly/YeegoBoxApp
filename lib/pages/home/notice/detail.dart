@@ -5,7 +5,6 @@ import '../../../common/loading.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:html/dom.dart' as dom;
-import 'package:transparent_image/transparent_image.dart';
 
 class NoticeDetail extends StatefulWidget{
   final int id;
@@ -75,8 +74,9 @@ class NoticeDetailState extends State<NoticeDetail>{
                           return new Center(
                             child: new FadeInImage.assetNetwork(
                               image: API.host + node.attributes['src'],
+                              fit: BoxFit.cover,
                               fadeInDuration: Duration(seconds: 2),
-                              placeholder: 'assets/images/logo_grey.png',
+                              placeholder: 'assets/images/placeholder.jpg',
                               placeholderScale: 3,
                             ),
                           );

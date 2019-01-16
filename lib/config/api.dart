@@ -37,4 +37,10 @@ class API{
 
   // 试用任务详情接口，必须参数：id(int),account_token(String)
   static const String getReleaseDetail = apiurl + r'/release/detail.html';
+
+  // 取消试用任务接口，必须参数：id(int),account_token(String)
+  static const String cancelRelease  = apiurl + r'/release/cancel.html';
+
+  // 验证试用任务接口，必须参数：id(int),account_token(String),shopname(String)
+  static const String checkRelease  = apiurl + r'/release/check.html';
 }

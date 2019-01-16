@@ -1,19 +1,58 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:flutter_swiper/flutter_swiper.dart';
+import 'package:url_launcher/url_launcher.dart';
+import '../../config/api.dart';
+import '../../common/http.dart';
+import '../../common/user.dart';
+import '../../common/loading.dart';
 
-class Detail extends StatefulWidget{
+class RDetail extends StatefulWidget{
   final int id;
-  Detail({Key key, this.id}) : super(key: key);
+  RDetail({Key key, this.id}) : super(key: key);
 
-  State<StatefulWidget> createState() => new DetailState();
+  State<StatefulWidget> createState() => new RDetailState();
 }
 
-class DetailState extends State<Detail> with TickerProviderStateMixin {
+class RDetailState extends State<RDetail> with TickerProviderStateMixin {
   //初始化页面数据
-  Map pageRowData = new Map();
+  Map pageRowData;
+  //数据控制字段
+  bool _loaded = false;
+  String _token;                                        //登录Token
+  TextEditingController _shopnameController = new TextEditingController();
 
   @override
   void initState() {
     super.initState();
+    initData().then((_){
+      setState(() {
+        _loaded = true;
+      });
+    });
+  }
+
+  Future<dynamic> initData() async {
+    await User.isLogin().then((_) async{
+      if(_){
+        await User.getAccountToken().then((token) async{
+          setState(() {
+            _token = token;
+          });
+        });
+      }
+    });
+    await Http.post(API.getReleaseDetail, data: {'account_token': _token, 'id': widget.id}).then((result) async{
+      if(result['code'] == 1){
+        setState(() {
+          pageRowData = result['data'];
+        });
+        return true;
+      }else{
+        Fluttertoast.showToast(msg: result['msg'], gravity: ToastGravity.CENTER);
+        return false;
+      }
+    });
   }
 
   @override
@@ -34,7 +73,27 @@ class DetailState extends State<Detail> with TickerProviderStateMixin {
           flexibleSpace: FlexibleSpaceBar(
             centerTitle: true,
             // title: Text('我是一个FlexibleSpaceBar',),
-            background: Image.asset('assets/images/slide04.jpg', fit: BoxFit.cover,),
+            background: pageRowData['thumbnail'] == null ? new Image.asset('assets/images/placeholder.jpg', fit: BoxFit.cover,) :  Swiper.children(
+              children: pageRowData['thumbnail'].map<Widget>((src){
+                return src != null ? 
+                new FadeInImage.assetNetwork(
+                  image: API.host + src,
+                  fit: BoxFit.cover,
+                  placeholder: 'assets/images/placeholder.jpg',
+                  placeholderScale: 2,
+                ):
+                 new Container();
+              }).toList(),
+              pagination: new SwiperPagination(
+                builder: DotSwiperPaginationBuilder(
+                  color: Colors.black54,
+                  activeColor: Colors.red,
+                )
+              ),
+              control: null,
+              autoplay: true,
+              onTap: (index) => print('点击了第$index个'),
+            ),
           ),
           leading: IconButton(
             icon: BackButtonIcon(),
@@ -48,7 +107,7 @@ class DetailState extends State<Detail> with TickerProviderStateMixin {
       ];
     }
 
-    Widget _body = new Container(
+    Widget _body = !_loaded ? new Container(): new Container(
       color: Colors.grey[100],
       child: new ListView(
         padding: EdgeInsets.all(0),
@@ -65,8 +124,8 @@ class DetailState extends State<Detail> with TickerProviderStateMixin {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
-                      Text('关键词'.toString(), style: TextStyle(color: Colors.grey,),),
-                      Text('官方正品保证，支持七天无理由退换'),
+                      Text('关键词', style: TextStyle(color: Colors.grey,),),
+                      Text(pageRowData['keywordname'] ?? ''),
                     ],
                   ),
                 ),
@@ -76,8 +135,8 @@ class DetailState extends State<Detail> with TickerProviderStateMixin {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
-                      Text('任务编号'.toString(), style: TextStyle(color: Colors.grey,),),
-                      Text('201886522679642578'),
+                      Text('任务编号', style: TextStyle(color: Colors.grey,),),
+                      Text(pageRowData['orderno'] ?? ''),
                     ],
                   ),
                 ),
@@ -87,8 +146,8 @@ class DetailState extends State<Detail> with TickerProviderStateMixin {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
-                      Text('任务类型'.toString(), style: TextStyle(color: Colors.grey,),),
-                      Text('淘宝自然搜索'),
+                      Text('任务类型', style: TextStyle(color: Colors.grey,),),
+                      Text((pageRowData['classname'] ?? '') + '自然搜索'),
                     ],
                   ),
                 ),
@@ -98,8 +157,8 @@ class DetailState extends State<Detail> with TickerProviderStateMixin {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
-                      Text('商家QQ'.toString(), style: TextStyle(color: Colors.grey,),),
-                      Text('1973509397'),
+                      Text('商家QQ', style: TextStyle(color: Colors.grey,),),
+                      Text(pageRowData['qq'] ?? ''),
                     ],
                   ),
                 ),
@@ -109,8 +168,8 @@ class DetailState extends State<Detail> with TickerProviderStateMixin {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
-                      Text('商家电话'.toString(), style: TextStyle(color: Colors.grey,),),
-                      Text('18218830556'),
+                      Text('商家电话', style: TextStyle(color: Colors.grey,),),
+                      Text(pageRowData['phone'] ?? ''),
                     ],
                   ),
                 ),
@@ -131,7 +190,7 @@ class DetailState extends State<Detail> with TickerProviderStateMixin {
                   child: Text('商家备注', style:TextStyle(color: Colors.orange)),
                 ),
                 new Divider(),
-                Text('历史记录及我诶离开手机打开手机陆金所了解睡懒觉历史记录及时的了解善良的加拉加斯老家的了解了无诶收到了减少了空间的离开手机来看及时的空间上课记得老师讲老司机老司机', style: TextStyle(height: 1.2,), maxLines: 5, overflow: TextOverflow.ellipsis,),
+                Text(pageRowData['requirement'] ?? '', style: TextStyle(height: 1.2,), maxLines: 5, overflow: TextOverflow.ellipsis,),
               ],
             ),
           ),
@@ -146,12 +205,14 @@ class DetailState extends State<Detail> with TickerProviderStateMixin {
               children: <Widget>[
                 new Padding(
                   padding: EdgeInsets.only(top: 8, bottom: 8),
-                  child: Text('店铺名称：谢****店', style:TextStyle(color: Colors.red)),
+                  child: Text('店铺名称：' + ((pageRowData != null) ? (pageRowData['status'] == 1 ? pageRowData['shopname'] : pageRowData['shopstarname']) : ''), style:TextStyle(color: Colors.red)),
                 ),
                 new Divider(),
+                pageRowData['status'] == 0 ? 
                 new Padding(
                   padding: EdgeInsets.only(right: 15, bottom: 8, top: 8),
                   child: new TextField(
+                    controller: _shopnameController,
                     decoration: InputDecoration(
                       contentPadding: EdgeInsets.only(top: 15, bottom: 15, left: 15, right: 15),
                       hintText: '注意店铺名称可能有空格或大写',
@@ -161,7 +222,7 @@ class DetailState extends State<Detail> with TickerProviderStateMixin {
                     ),
                     cursorColor: Colors.green,
                   ),
-                ),
+                ) : new Container(),
               ],
             ),
           ),
@@ -186,7 +247,14 @@ class DetailState extends State<Detail> with TickerProviderStateMixin {
                           borderRadius: BorderRadius.all(Radius.circular(5))
                         ),
                         child: Text('点击这里联系商家', style: TextStyle(color: Colors.white)),
-                        onPressed: (){},
+                        onPressed: () async {
+                          final String url = 'mqqwpa://im/chat?chat_type=wpa&uin=' + pageRowData['qq'] + '&version=1&src_type=web&web_src=oicqzone.com';
+                          if (await canLaunch(url)) {
+                            await launch(url);
+                          } else {
+                            throw 'Could not launch $url';
+                          }
+                        },
                       ),
                     ],
                   ),
@@ -197,44 +265,91 @@ class DetailState extends State<Detail> with TickerProviderStateMixin {
             ),
           ),
 
+          new Container(
+            width: MediaQuery.of(context).size.width,
+            padding: EdgeInsets.all(25),
+            child: new Offstage(
+              offstage: pageRowData['status'] == 0 ? false : true,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  new Expanded(
+                    child: new FlatButton(
+                      color: Colors.green,
+                      padding: EdgeInsets.only(top: 12, bottom: 12, left: 25, right: 25),
+                      shape: RoundedRectangleBorder(
+                        side: BorderSide.none,
+                        borderRadius: BorderRadius.all(Radius.circular(8)),
+                      ),
+                      onPressed: () {
+                        if(pageRowData['status'] != 0){
+                          Fluttertoast.showToast(msg: '只能审核进行中的任务', gravity: ToastGravity.CENTER);
+                          return;
+                        }
+                        if(_shopnameController.text == ''){
+                          Fluttertoast.showToast(msg: '请输入店铺名称', gravity: ToastGravity.CENTER);
+                          return;
+                        }
+                        Http.post(API.checkRelease, data: {'account_token': _token, 'id': widget.id, 'shopname': _shopnameController.text}).then((result){
+                            if(result['code'] == 1){
+                              Fluttertoast.showToast(msg: result['msg'], gravity: ToastGravity.CENTER).then((_) async{
+                                setState(() {
+                                  pageRowData['status'] = 2;
+                                });
+                              });
+                            }else{
+                              Fluttertoast.showToast(msg: result['msg'], gravity: ToastGravity.CENTER);
+                            }
+                        });
+                      },
+                      child: Text('提交审核', style: new TextStyle(color: Colors.white, fontSize: 16.0),)
+                    ),
+                  ),
+                  new Container(
+                    width: 20,
+                  ),
+                  new Expanded(
+                    child: new FlatButton(
+                      color: Colors.red,
+                      padding: EdgeInsets.only(top: 12, bottom: 12, left: 25, right: 25),
+                      shape: RoundedRectangleBorder(
+                        side: BorderSide.none,
+                        borderRadius: BorderRadius.all(Radius.circular(8)),
+                      ),
+                      onPressed: () {
+                        if(pageRowData['status'] != 0){
+                          Fluttertoast.showToast(msg: '只能取消进行中的任务', gravity: ToastGravity.CENTER);
+                          return;
+                        }
+                        Http.post(API.cancelRelease, data: {'account_token': _token, 'id': widget.id}).then((result){
+                            if(result['code'] == 1){
+                              Fluttertoast.showToast(msg: result['msg'], gravity: ToastGravity.CENTER).then((_) async{
+                                setState(() {
+                                  pageRowData['status'] = -1;
+                                });
+                              });
+                            }else{
+                              Fluttertoast.showToast(msg: result['msg'], gravity: ToastGravity.CENTER);
+                            }
+                        });
+                      },
+                      child: Text('取消任务', style: new TextStyle(color: Colors.white, fontSize: 16.0),)
+                    ),
+                  )
+                ],
+              ),
+            ),
+          ),
           //按钮组
-          new Padding(
-            padding: EdgeInsets.only(top: 25, left: 15, right: 15),
-            child: new FlatButton(
-              color: Colors.green,
-              padding: EdgeInsets.all(12),
-              shape: RoundedRectangleBorder(
-                side: BorderSide.none,
-                borderRadius: BorderRadius.all(Radius.circular(8)),
-              ),
-              onPressed: () {
-
-              },
-              child: Text('提交审核', style: new TextStyle(color: Colors.white, fontSize: 16.0),)
-            ),
-          ),
-          new Padding(
-            padding: EdgeInsets.only(top: 8, left: 15, right: 15),
-            child: new FlatButton(
-              color: Colors.red,
-              padding: EdgeInsets.all(12),
-              shape: RoundedRectangleBorder(
-                side: BorderSide.none,
-                borderRadius: BorderRadius.all(Radius.circular(8)),
-              ),
-              onPressed: () {
-
-              },
-              child: Text('取消任务', style: new TextStyle(color: Colors.white, fontSize: 16.0),)
-            ),
-          ),
+          
         ],
       ),
     );
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        body: NestedScrollView(
+        body: !_loaded ? new LoadingView(): NestedScrollView(
           headerSliverBuilder: _sliverBuilder,
           body: _body,
         ),

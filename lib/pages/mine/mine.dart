@@ -10,6 +10,8 @@ import '../home/notice/notice.dart';
 import 'setting/setting.dart';
 import 'resetpassword/resetpassword.dart';
 import 'wallet/wallet.dart';
+import 'bank/list.dart';
+import 'account/account.dart';
 
 class Mine extends StatefulWidget{
   State<StatefulWidget> createState() => new MineState();
@@ -48,14 +50,14 @@ class MineState extends State with AutomaticKeepAliveClientMixin{
 
   //初始化界面数据
   Future<dynamic> initData() async{
-    User.isLogin().then((verify){
+    await User.isLogin().then((verify) async{
       if(verify){
         //改变登录状态标识
         setState(() {
           _login = true;
         });
         //根据缓存初始化用户头像等数据
-        User.getUserInfo().then((result){
+        await User.getUserInfo().then((result){
           setState(() {
             _userInfo = result;
           });
@@ -97,7 +99,10 @@ class MineState extends State with AutomaticKeepAliveClientMixin{
                     ],
                   ),
                   onTap: (){
-
+                    Navigator.of(super.context).push(
+                      new MaterialPageRoute(
+                          builder: (BuildContext context) => new Account()),
+                    );
                   },
                 ) : 
                 new GestureDetector(
@@ -268,20 +273,36 @@ class MineState extends State with AutomaticKeepAliveClientMixin{
           new Container(
             child: new Column(
               children: <Widget>[
-                new Container(
-                  child: new Row(
-                    children: <Widget>[
-                      Row(
-                        children: <Widget>[
-                          Icon(Icons.payment, size: 24, color: Colors.red,),
-                          Text(' 收款银行卡', style: TextStyle(fontSize: 16),)
-                        ],
-                      ),
-                      Icon(Icons.chevron_right, color: Colors.grey,)
-                    ],
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                new GestureDetector(
+                  behavior: HitTestBehavior.translucent,
+                  child: new Container(
+                    child: new Row(
+                      children: <Widget>[
+                        Row(
+                          children: <Widget>[
+                            Icon(Icons.payment, size: 24, color: Colors.red,),
+                            Text(' 收款银行卡', style: TextStyle(fontSize: 16),)
+                          ],
+                        ),
+                        Icon(Icons.chevron_right, color: Colors.grey,)
+                      ],
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    ),
+                    padding: EdgeInsets.only(top: 15, bottom: 15, left: 5, right: 8),
                   ),
-                  padding: EdgeInsets.only(top: 15, bottom: 15, left: 5, right: 8),
+                  onTap: (){
+                    if(_login){
+                      Navigator.of(super.context).push(
+                        new MaterialPageRoute(
+                            builder: (BuildContext context) => new BankList())
+                      );
+                    }else{
+                      Navigator.of(super.context).push(
+                        new MaterialPageRoute(
+                            builder: (BuildContext context) => new Login(), fullscreenDialog: true),
+                      );
+                    }
+                  },
                 ),
                 new Divider(indent: 5, height: 0, color: Colors.grey[200]),
                 new Container(

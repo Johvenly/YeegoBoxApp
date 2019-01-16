@@ -9,6 +9,7 @@ import '../../common/loading.dart';
 import 'notice/notice.dart';
 import 'notice/detail.dart';
 import '../auth/login.dart';
+import '../release/detail.dart';
 
 class Home extends StatefulWidget{
   @override
@@ -55,29 +56,31 @@ class HomeState extends State{
         });
       }
     });
-    await User.isLogin().then((_){
+    await User.isLogin().then((_) async{
       if(_){
-        User.getAccountToken().then((token) async{
+        await User.getAccountToken().then((token) async{
+          // 认证并初始化会员信息
           await Http.post(API.initUser, data: {'account_token': token}).then((result){
             if(result['code'] == 1){
               setState(() {
                 _userinfo = result['data'];
                 _token = result['data']['token'];
               });
+              User.saveUserInfo(result['data']);
             }else{
               Fluttertoast.showToast(msg: '您已在其他地方登录或账号已过期', gravity: ToastGravity.CENTER);
               User.delAccountToken();
             }
           });
-          Http.post(API.getReleaseCount, data: {'account_token': token}).then((result){
+          // 加载试用任务统计数据
+          await Http.post(API.getReleaseCount, data: {'account_token': token}).then((result){
             if(result['code'] == 1){
-              setState(() {
-                _releaseList.map((row){
+              setState((){
+                _releaseList.forEach((row){
                   int index = _releaseList.indexOf(row);
-                  _releaseList[index]['stock'] = row[_releaseList[index]['classid']];
+                  _releaseList[index]['stock'] = result['data'][row['classid'].toString()] ?? 0 ;
                 });
               });
-              print(result);
             }
           });
         });
@@ -258,9 +261,23 @@ class HomeState extends State{
                     return;
                   }
                   if((_priceController.text == '' || double.parse(_priceController.text) <= 0) && _releaseSelectClassID != 5){
+                    Fluttertoast.showToast(msg: '请输入您能垫付的最大金额', gravity: ToastGravity.CENTER);
                     return;
                   }
-                  print(_priceController.text + '-' + _releaseSelectClassID.toString());
+                  double price = _releaseSelectClassID == 5 ? 0.00 : double.parse(_priceController.text);
+                  // 提交任务申请
+                  Http.post(API.getRelease, data: {'account_token': _token, 'type': _releaseSelectClassID, 'price': price}).then((result){
+                    if(result['code'] == 1){
+                      Fluttertoast.showToast(msg: result['msg'], gravity: ToastGravity.CENTER).then((_) async{
+                        await Navigator.of(super.context).push(
+                          new MaterialPageRoute(
+                              builder: (BuildContext context) => new RDetail(id: int.parse(result['data']))),
+                        );
+                      });
+                    }else{
+                      Fluttertoast.showToast(msg: result['msg'], gravity: ToastGravity.CENTER);
+                    }
+                  });
                 },
                 child: Text('接受任务', style: new TextStyle(color: Colors.white, fontSize: 16.0),
               )

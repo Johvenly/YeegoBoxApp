@@ -1,8 +1,12 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'detail.dart';
 import '../../config/api.dart';
+import '../../common/http.dart';
 import '../../common/user.dart';
 import '../../common/loading.dart';
 
@@ -16,8 +20,8 @@ class RTaskState extends State<RTask> with SingleTickerProviderStateMixin,Automa
   bool get wantKeepAlive => true;
 
   //数据控制字段
-  bool _login = false;
-  bool _loaded = true;
+  bool _loaded = false;
+  String _token;                                        //登录Token
 
   TabController _tabController;
 
@@ -37,9 +41,9 @@ class RTaskState extends State<RTask> with SingleTickerProviderStateMixin,Automa
       // }catch(e){}
     });
 
-    initData().then((e){
+    initData().then((_){
       setState(() {
-        _loaded = false;
+        _loaded = true;
       });
     });
     print('RTask初始化状态');
@@ -47,33 +51,17 @@ class RTaskState extends State<RTask> with SingleTickerProviderStateMixin,Automa
 
   //初始化界面数据
   Future<dynamic> initData() async{
-    User.isLogin().then((verify){
-      //改变登录状态标识
-      setState(() {
-        _login = verify;
-      });
+    await User.isLogin().then((_) async{
+      if(_){
+        await User.getAccountToken().then((token) async{
+          setState(() {
+            _token = token;
+          });
+        });
+      }
     });
     print('RTask界面数据初始化...');
   }
-
-  // 任务列表
-  List _taskList = <Map>[
-    {'id': 1, 'score': 8, 'time': '2018.10.12 16:18', 'status': '进行中', 'class': '拼多多', 'number': '201812134538732987'},
-    {'id': 2, 'score': 5, 'time': '2018.10.02 05:34', 'status': '待审核', 'class': '京东', 'number': '201810024438473672'},
-    {'id': 3, 'score': 6, 'time': '2018.09.12 23:21', 'status': '待审核', 'class': '淘宝', 'number': '201809124837584943'},
-    {'id': 4, 'score': 12, 'time': '2018.08.09 14:56', 'status': '待审核', 'class': '淘宝', 'number': '201809124837584943'},
-    {'id': 5, 'score': 3, 'time': '2018.08.01 09:13', 'status': '待审核', 'class': '淘宝', 'number': '201809124837584943'},
-    {'id': 6, 'score': 6, 'time': '2018.07.30 23:21', 'status': '待审核', 'class': '淘宝', 'number': '201809124837584943'},
-  ];
-
-  List _rowList = <Map>[
-    {'id': 8, 'score': 12, 'time': '2018.12.10 16:18', 'status': '已完成', 'class': '拼多多', 'number': '201812223838284432'},
-    {'id': 9, 'score': 20, 'time': '2018.10.02 05:34', 'status': '已完成', 'class': '京东', 'number': '201810024438473672'},
-    {'id': 11, 'score': 14, 'time': '2018.09.12 23:21', 'status': '已完成', 'class': '淘宝', 'number': '201809124837584943'},
-    {'id': 12, 'score': 15, 'time': '2018.08.09 14:56', 'status': '已完成', 'class': '淘宝', 'number': '201809124837584943'},
-    {'id': 13, 'score': 3, 'time': '2018.08.01 09:13', 'status': '已完成', 'class': '淘宝', 'number': '201809124837584943'},
-    {'id': 18, 'score': 9, 'time': '2018.07.30 23:21', 'status': '已完成', 'class': '淘宝', 'number': '201809124837584943'},
-  ];
   
   @override
   Widget build(BuildContext context){
@@ -82,18 +70,18 @@ class RTaskState extends State<RTask> with SingleTickerProviderStateMixin,Automa
         controller: _tabController,
         children: <Widget>[
           // 任务列表View
-          new TaskListView(datalist: _taskList,),
-          new TaskListView(datalist: _rowList,),
+          new TaskListView(type: 0, token: _token,),
+          new TaskListView(type: 1, token: _token,),
         ],
       ),
     );
 
-    return _loaded ? new LoadingView() : Scaffold(
+    return !_loaded ? new LoadingView() : Scaffold(
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.green,
         title: Text('试客任务'),
-        bottom: _login ? new TabBar(
+        bottom: _token != null ? new TabBar(
           controller: _tabController,
           indicatorColor: Colors.white,
           tabs: <Widget>[
@@ -102,7 +90,7 @@ class RTaskState extends State<RTask> with SingleTickerProviderStateMixin,Automa
           ],
         ) : null,
       ),
-      body: _login ? _body : LoadingView.finished(title: '您当前未登录！'),
+      body: _token != null ? _body : LoadingView.finished(title: '您当前未登录！'),
     );
   }
 }
@@ -110,8 +98,9 @@ class RTaskState extends State<RTask> with SingleTickerProviderStateMixin,Automa
 
 //任务列表显示控件
 class TaskListView extends StatefulWidget{
-  final List datalist;
-  TaskListView({Key key, this.datalist}): super(key: key);
+  final int type;
+  final String token;
+  TaskListView({Key key, this.type, this.token}): super(key: key);
 
   @override
   State<StatefulWidget> createState() => new TaskListViewState();
@@ -121,9 +110,135 @@ class TaskListViewState extends State<TaskListView> with AutomaticKeepAliveClien
   @override
   bool get wantKeepAlive => true;
 
+  RefreshController _controller;
+
+  // 数据控制字段
+  bool _loaded = false;                                 //界面初始化数据加载控制
+  List list = new List();                               //列表数据
+  int _page = 2;                                        //加载的页数
+  bool _noMore = false;                                 //是否已停止加载数据（无更多数据）
+  Widget _emptyWight = new LoadingView();               //空的加载Widget
+
   @override
-  Widget build(BuildContext context){
-    Widget _li(Map row){
+  void initState() {
+    super.initState();
+    initData().then((_){
+      setState(() {
+        if(list.length > 0){
+          _loaded = true;
+        }else{
+          _emptyWight = LoadingView.finished(title: '暂无数据');
+        }
+      });
+    });
+    _controller = new RefreshController();
+  }
+
+  //初始化界面数据
+  Future<dynamic> initData() async{
+    await _fetch(page: 1);
+    print('tab1数据初始化...');
+  }
+
+  // 加载数据函数
+  Future _fetch({page = 1}) async {
+    return await Http.post(API.getReleaseList, data: {'page': page, 'type': widget.type, 'account_token': widget.token}).then((result){
+      if(result['code'] == 1){
+        setState(() {
+          _page = page + 1;                                 //有数据时增加页数
+          list.addAll(result['data']);
+
+          // 判断是否无更多数据
+          if(result['data'].length < result['pageach']){
+            _noMore = true;
+          }
+        });
+        return true;
+      }else{
+        Fluttertoast.showToast(msg: result['msg'], gravity: ToastGravity.CENTER);
+        return false;
+      }
+    });
+  }
+
+  //刷新加载数据
+  void _onRefresh(bool up) {
+    if (up){
+      list.clear();
+      _noMore = false;
+      _controller.sendBack(false, RefreshStatus.canRefresh);
+
+      new Future.delayed(const Duration(milliseconds: 2009)).then((val) {
+        _fetch(page: 1).then((_){
+          if(_){
+            _controller.sendBack(true, RefreshStatus.completed);
+          }else{
+            _controller.sendBack(true, RefreshStatus.failed);
+          }
+        });
+      });
+      print("下拉刷新列表...");
+    }else {
+      if(_noMore){
+        _controller.sendBack(false, RefreshStatus.noMore);
+        return;
+      }
+
+      new Future.delayed(const Duration(milliseconds: 1000)).then((val) {
+        _fetch(page: _page).then((_){
+          if(_){
+            _controller.sendBack(false, RefreshStatus.completed);
+          }else{
+            _controller.sendBack(false, RefreshStatus.failed);
+          }
+        });
+      });
+      print("上拉加载更多...");
+    }
+  }
+
+  // 头部指示器构造
+  Widget _headerCreate(BuildContext context, int mode) {
+    return new Container(
+      decoration: BoxDecoration(
+        border: Border(bottom: BorderSide(color: Colors.grey[100]))
+      ),
+      child: ClassicIndicator(
+        mode: mode,
+        height: 50,
+        spacing: 8,
+        refreshingIcon: SpinKitRing(color: Colors.green, size: 20, lineWidth: 2.0,),
+        refreshingText: '一大波数据正在赶来...',
+        idleText: '下拉刷新列表...',
+        releaseText: '放开开始刷新...',
+        failedText: '刷新数据失败',
+        completeText: '完成更新列表',
+      ),
+    );
+  }
+
+  // 尾部指示器构造
+  Widget _footerCreate(BuildContext context, int mode) {
+    return new ClassicIndicator(
+      mode: mode,
+      height: 50,
+      spacing: 8,
+      refreshingIcon: SpinKitRing(color: Colors.green, size: 20, lineWidth: 2.0,),
+      refreshingText: '一大波数据正在赶来...',
+      idleIcon: const Icon(Icons.arrow_upward),
+      idleText: '上拉加载更多...',
+      releaseIcon: Icon(Icons.arrow_downward),
+      releaseText: '放开开始加载...',
+      completeText: '完成加载列表',
+      failedText: '加载数据失败',
+      noDataText: '----- 我也是有底线的 -----',
+      noMoreIcon: new Container()
+    );
+  }
+
+  // 列表单条记录Widget
+  Widget _renderRow(BuildContext context, int index) {
+    if (index < list.length) {
       return new GestureDetector(
         child: new Container(
           padding: EdgeInsets.only(top: 15, bottom: 15),
@@ -144,9 +259,9 @@ class TaskListViewState extends State<TaskListView> with AutomaticKeepAliveClien
                         border: Border.all(color: Colors.green[100]),
                         borderRadius: BorderRadius.all(Radius.circular(20))
                       ),
-                      child: Text('积分 ' + row['score'].toString(), style: TextStyle(color: Colors.green[100]),),
+                      child: Text('积分 ' + list[index]['businessconsum'].toString(), style: TextStyle(color: Colors.green[100]),),
                     ),
-                    Text(row['time'], style: TextStyle(color: Colors.grey),),
+                    Text(list[index]['createtime'], style: TextStyle(color: Colors.grey),),
                   ],
                 ),
               ),
@@ -161,7 +276,7 @@ class TaskListViewState extends State<TaskListView> with AutomaticKeepAliveClien
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
                           Text('任务状态'),
-                          Text(row['status'], style: TextStyle(color: row['status'] == '已完成' ? Colors.green : Colors.orange),),
+                          Text(list[index]['statusValue'], style: TextStyle(color: list[index]['status'] == 1 ? Colors.green : Colors.orange),),
                         ],
                       ),
                     ),
@@ -171,7 +286,7 @@ class TaskListViewState extends State<TaskListView> with AutomaticKeepAliveClien
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
                           Text('试用平台'),
-                          Text(row['class'], style: TextStyle(color: Colors.grey),),
+                          Text(list[index]['classname'], style: TextStyle(color: Colors.grey),),
                         ],
                       ),
                     ),
@@ -181,7 +296,7 @@ class TaskListViewState extends State<TaskListView> with AutomaticKeepAliveClien
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
                           Text('任务编号'),
-                          Text(row['number'], style: TextStyle(color: Colors.grey),),
+                          Text(list[index]['orderno'], style: TextStyle(color: Colors.grey),),
                         ],
                       ),
                     ),
@@ -194,23 +309,27 @@ class TaskListViewState extends State<TaskListView> with AutomaticKeepAliveClien
         onTap: (){
           Navigator.of(super.context).push(
             new MaterialPageRoute(
-                builder: (BuildContext context) => new Detail(id: row['id'])),
+                builder: (BuildContext context) => new RDetail(id: list[index]['id'])),
           );
         },
       );
     }
+  }
 
-    // 任务列表View
-    return (widget.datalist.length > 0) ? 
-    new ListView.builder(
-      padding: EdgeInsets.only(top: 8),
-      itemCount: widget.datalist.length,
-      itemBuilder: (BuildContext context, int index){
-        return _li(widget.datalist[index]);
-      },
-    ) : 
-    new Center(
-      child: Text('无数据'),
+  Widget build(BuildContext context){
+    return  !_loaded ? _emptyWight : new SmartRefresher(
+      enablePullDown: true,
+      enablePullUp: (widget.type == 0) ? false : true,
+      controller: _controller,
+      onRefresh: _onRefresh,
+      headerBuilder: _headerCreate,
+      footerBuilder: _footerCreate,
+      footerConfig: new RefreshConfig(),
+      child: new ListView.builder(
+        padding: EdgeInsets.only(top: 8),
+        itemBuilder: _renderRow,
+        itemCount: list.length,
+      ),
     );
   }
 }
