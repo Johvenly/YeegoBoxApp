@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../common/user.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'withdraw.dart';
 
 class Wallet extends StatefulWidget{
   final String type;
@@ -53,10 +54,15 @@ class WalletState extends State<Wallet>{
                   onPressed: (){
                     if(_money <= 0){
                       Fluttertoast.showToast(msg: '无可提现余额', gravity: ToastGravity.CENTER);
+                      return;
                     }
+                    Navigator.of(super.context).push(
+                      new MaterialPageRoute(
+                          builder: (BuildContext context) => new Withdraw(type: widget.type,)),
+                    );
                   },
                 ) : new Container(),
-                Text('提现底部提示信息', style: TextStyle(color: Colors.grey),),
+                Text('请注意资金安全', style: TextStyle(color: Colors.grey),),
               ],
             ),
           ),

@@ -40,26 +40,57 @@ class IndexState extends State<Index>{
       onTap: (index){
         setState(() {
           _currentIndex = index;      //修改当前页面索引  
-          _pageController.jumpToPage(index);
+          // _pageController.jumpToPage(index);
           // _pageController.animateToPage(index,
           //   duration: const Duration(milliseconds: 300), curve: Curves.ease);
         });
       },
     );
     /*-----bottom nav end-------*/
-    return new Scaffold(
+    return new MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: new Scaffold(
         // body: _pageList[_currentIndex],
-        body: new PageView(
+        // body: new PageView(
+        //   children: _pageList,
+        //   controller: _pageController,
+        //   onPageChanged: (int index){
+        //     setState(() {
+        //       _currentIndex = index;      //修改当前页面索引 
+        //     });
+        //   }
+        // ),
+        body: new IndexedStack(
+          index: _currentIndex,
           children: _pageList,
-          controller: _pageController,
-          onPageChanged: (int index){
-            setState(() {
-              _currentIndex = index;      //修改当前页面索引 
-            });
-          }
         ),
         bottomNavigationBar: _bottomNavigationBar,
         resizeToAvoidBottomPadding: false,
-      );
+      ),
+    );
+    // return new MaterialApp(
+    //   debugShowCheckedModeBanner: false,
+    //   home: new Scaffold(
+    //     appBar: AppBar(
+    //       title: Text('sdfs'),
+    //     ),
+    //     bottomNavigationBar: _bottomNavigationBar,
+    //     body: new IndexedStack(
+    //     index: _currentIndex,
+    //     children: <Widget>[
+    //       new Home(),
+    //       new Empty(),
+    //       new Empty(),
+    //       new Container(
+    //         child: new TextField(
+    //           decoration: InputDecoration(
+    //             hintText: '这是第四个文本框'
+    //           ),
+    //         ),
+    //       ),
+    //     ],
+    //   ),
+    //   ),
+    // );
   }
 }

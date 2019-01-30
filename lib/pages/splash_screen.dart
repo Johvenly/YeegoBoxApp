@@ -27,9 +27,7 @@ class _SplashScreenState extends State<SplashScreen>
         _time = Timer.periodic(Duration(seconds: 1),(timer) {
           if(_seconds <= 0){
             timer.cancel();
-            Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(builder: (context) => new Index()),
-              (route) => route == null);
+            Navigator.pushReplacement( context, MaterialPageRoute(builder: (BuildContext context) => new Index()));
           }else{
             setState(() {
               _seconds --;
@@ -80,9 +78,7 @@ class _SplashScreenState extends State<SplashScreen>
             ),
             onTap: (){
               _time.cancel();
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (context) => new Index()),
-                (route) => route == null);
+              Navigator.pushReplacement( context, MaterialPageRoute(builder: (BuildContext context) => new Index()));
             },
           ),
         ),

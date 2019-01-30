@@ -43,4 +43,16 @@ class API{
 
   // 验证试用任务接口，必须参数：id(int),account_token(String),shopname(String)
   static const String checkRelease  = apiurl + r'/release/check.html';
+
+  // 获取银行卡列表接口
+  static const String getBankList = apiurl + r'/wallet/banklist.html';
+
+  // 绑定银行卡接口
+  static const String bindBank = apiurl + r'/wallet/bindbank.html';
+
+  // 删除银行卡接口
+  static const String delBank = apiurl + r'/wallet/delbank.html';
+
+  // 提现接口
+  static const String withdraw = apiurl + r'/wallet/withdraw.html';
 }

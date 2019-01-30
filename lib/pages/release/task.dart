@@ -36,9 +36,7 @@ class RTaskState extends State<RTask> with SingleTickerProviderStateMixin,Automa
     super.initState();
     _tabController = new TabController(vsync: this, length: 2);
     UserEvent.eventBus.on<UserEvent>().listen((_){
-      // try{
-      //   initData();
-      // }catch(e){}
+      initData();
     });
 
     initData().then((_){
@@ -155,7 +153,7 @@ class TaskListViewState extends State<TaskListView> with AutomaticKeepAliveClien
         });
         return true;
       }else{
-        Fluttertoast.showToast(msg: result['msg'], gravity: ToastGravity.CENTER);
+        // Fluttertoast.showToast(msg: result['msg'], gravity: ToastGravity.CENTER);
         return false;
       }
     });

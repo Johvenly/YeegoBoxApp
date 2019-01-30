@@ -340,12 +340,12 @@ class MineState extends State with AutomaticKeepAliveClientMixin{
                   ),
                   onTap: (){
                     if(_login){
-                      Navigator.of(super.context).push(
+                      Navigator.of(context).push(
                         new MaterialPageRoute(
                             builder: (BuildContext context) => new ResetPassword())
                       );
                     }else{
-                      Navigator.of(super.context).push(
+                      Navigator.of(context).push(
                         new MaterialPageRoute(
                             builder: (BuildContext context) => new Login(), fullscreenDialog: true),
                       );
@@ -402,7 +402,9 @@ class MineState extends State with AutomaticKeepAliveClientMixin{
       ),
     );
     
-    return _loaded ? new LoadingView() : Scaffold(
+    return _loaded ? new LoadingView() : MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Scaffold(
         appBar: AppBar(
           elevation: 0,
           backgroundColor: Colors.green,
@@ -430,7 +432,8 @@ class MineState extends State with AutomaticKeepAliveClientMixin{
           ],
         ),
         body: _body,
-      );
+      ),
+    );
   }
 }
 

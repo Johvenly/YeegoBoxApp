@@ -16,7 +16,9 @@ class Home extends StatefulWidget{
   State<StatefulWidget> createState() => new HomeState();
 }
 
-class HomeState extends State{
+class HomeState extends State with AutomaticKeepAliveClientMixin{
+  @override
+  bool get wantKeepAlive => true;
 
     // 定义数据控制字段
     bool _loaded = false; 
@@ -35,6 +37,8 @@ class HomeState extends State{
     Map _userinfo = new Map();              //用户信息
     String _token;                          //登录Token
     TextEditingController _priceController = new TextEditingController();
+    FocusNode _focusNode;
+    FocusScopeNode _focusScopeNode = new FocusScopeNode();
 
   //初始化控件状态
   @override
@@ -45,6 +49,16 @@ class HomeState extends State{
           _loaded = true;
         });
       });
+      _focusNode = new FocusNode();
+      _focusNode.addListener((){
+        print(_focusNode.hasFocus);
+      });
+    }
+
+  @override
+    void dispose(){
+      super.dispose();
+      _focusNode.dispose();
     }
 
   //初始化界面数据
@@ -91,6 +105,10 @@ class HomeState extends State{
   
   @override
   Widget build(BuildContext context){
+    // FocusScope.of(context).setFirstFocus(_focusScopeNode);
+    // FocusScope.of(context).reparentIfNeeded(_focusNode);
+    // FocusScope.of(super.context).requestFocus(_focusNode);
+    // FocusScope.of(context).setFirstFocus(new FocusScopeNode());
     Widget _body = new Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -238,9 +256,19 @@ class HomeState extends State{
                 enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.grey[300])),
                 focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.green),),
               ),
+              enabled: true,
               cursorColor: Colors.green,
-              // autofocus: true,
-              focusNode: FocusNode(),
+              autofocus: true,
+              focusNode: _focusNode,
+              onTap: (){
+                if(_focusNode.hasFocus){
+                  print('sfsf');
+                }
+                // FocusScope.of(context).setFirstFocus(_focusNode);
+                // FocusScope.of(context).reparentIfNeeded(_focusNode);
+                FocusScope.of(context).requestFocus(_focusNode);
+                print('地点收拾收拾');
+              },
             ),
           ) : new Container(),
           new Padding(

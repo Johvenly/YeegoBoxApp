@@ -72,7 +72,7 @@ class LoginState extends State<Login>{
                 leading: IconButton(
                   icon: Icon(Icons.close),
                   onPressed: (){
-                    Navigator.pop(super.context);
+                    Navigator.pop(context);
                   },
                 ),
               ),
