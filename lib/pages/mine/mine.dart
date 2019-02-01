@@ -144,7 +144,14 @@ class MineState extends State with AutomaticKeepAliveClientMixin{
                       Navigator.of(super.context).push(
                         new MaterialPageRoute(
                             builder: (BuildContext context) => new Wallet(type: User.FIELD_AVERAGEREWARD,)),
-                      );
+                      ).then((_){
+                        if(_ != null){
+                          setState(() {
+                            _userInfo[User.FIELD_AVERAGEREWARD] = _.toString();                         
+                          });
+                          User.saveFieldForDouble(User.FIELD_AVERAGEREWARD, _);
+                        }
+                      });
                     }else{
                       Navigator.of(super.context).push(
                         new MaterialPageRoute(
@@ -168,7 +175,14 @@ class MineState extends State with AutomaticKeepAliveClientMixin{
                       Navigator.of(super.context).push(
                         new MaterialPageRoute(
                             builder: (BuildContext context) => new Wallet(type: User.FIELD_PROMOTIONREWARD,)),
-                      );
+                      ).then((_){
+                        if(_ != null){
+                          setState(() {
+                            _userInfo[User.FIELD_PROMOTIONREWARD] = _.toString();                         
+                          });
+                          User.saveFieldForDouble(User.FIELD_PROMOTIONREWARD, _);
+                        }
+                      });
                     }else{
                       Navigator.of(super.context).push(
                         new MaterialPageRoute(

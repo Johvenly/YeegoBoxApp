@@ -73,17 +73,15 @@ class HomeState extends State with AutomaticKeepAliveClientMixin{
     await User.isLogin().then((_) async{
       if(_){
         await User.getAccountToken().then((token) async{
-          // 认证并初始化会员信息
-          await Http.post(API.initUser, data: {'account_token': token}).then((result){
+          setState(() {   
+            _token = token;
+          });
+          // 查询会员附加信息
+          await Http.post(API.subUser, data: {'account_token': token}).then((result){
             if(result['code'] == 1){
               setState(() {
                 _userinfo = result['data'];
-                _token = result['data']['token'];
               });
-              User.saveUserInfo(result['data']);
-            }else{
-              Fluttertoast.showToast(msg: '您已在其他地方登录或账号已过期', gravity: ToastGravity.CENTER);
-              User.delAccountToken();
             }
           });
           // 加载试用任务统计数据

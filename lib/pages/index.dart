@@ -3,6 +3,10 @@ import 'home/home.dart';
 import 'browse/task.dart';
 import 'release/task.dart';
 import 'mine/mine.dart';
+import '../config/api.dart';
+import '../common/user.dart';
+import '../common/http.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class Index extends StatefulWidget {
   @override
@@ -18,6 +22,33 @@ class IndexState extends State<Index>{
     new BTask(),
     new Mine(),
   ];
+
+  //初始化控件状态
+  @override
+    void initState(){
+      super.initState();
+      initData();
+    }
+  
+  //初始化界面数据
+  Future<dynamic> initData() async{
+    User.isLogin().then((_){
+      if(_){
+        User.getAccountToken().then((token){
+          // 认证并初始化会员信息
+          Http.post(API.initUser, data: {'account_token': token}).then((result){
+            if(result['code'] == 1){
+              User.saveUserInfo(result['data']);
+            }else{
+              Fluttertoast.showToast(msg: '您已在其他地方登录或账号已过期', gravity: ToastGravity.CENTER);
+              User.delAccountToken();
+            }
+          });
+        });
+      }
+    });
+  }
+
   Widget build(BuildContext context) {
     /*-----bottom nav start-------*/
     BottomNavigationBarItem _bottomNavigationBarItem(IconData icon, IconData activeIcon, String title, int itemIndex){

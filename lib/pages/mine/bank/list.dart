@@ -10,10 +10,7 @@ class BankList extends StatefulWidget{
   State<StatefulWidget> createState() => new BankListState();
 }
 
-class BankListState extends State with AutomaticKeepAliveClientMixin{
-  @override
-  bool get wantKeepAlive => true;
-
+class BankListState extends State{
   //数据控制字段
   bool _loaded = false;
   List list = new List();                               //列表数据
@@ -50,9 +47,6 @@ class BankListState extends State with AutomaticKeepAliveClientMixin{
           list = result['data'];
         });
         return true;
-      }else{
-        Fluttertoast.showToast(msg: result['msg'], gravity: ToastGravity.CENTER);
-        return false;
       }
     });
   }
@@ -134,10 +128,12 @@ class BankListState extends State with AutomaticKeepAliveClientMixin{
                   new MaterialPageRoute(
                       builder: (BuildContext context) => new BankBind(), fullscreenDialog: true),
                 ).then((row){
-                  super.setState(() {
-                    list.add(row);
-                  });
-                  print(row);
+                  if(row != null){
+                    setState(() {
+                      list.add(row);
+                    });
+                  }
+                  print(list);
                 });
               },
             )

@@ -14,14 +14,12 @@ class SettingState extends State{
         padding: EdgeInsets.only(top: 15),
         children: <Widget>[
           new Padding(
-            padding: EdgeInsets.only(left: 25, right: 25),
+            padding: EdgeInsets.all(0),
             child: new FlatButton(
-              color: Colors.red,
+              color: Colors.white,
               padding: EdgeInsets.all(12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(8))
-              ),
-              child: Text('退出登录', style: TextStyle(color: Colors.white),),
+              shape: Border(top: BorderSide(color: Colors.grey[100]), bottom: BorderSide(color: Colors.grey[100])),
+              child: Text('退出登录', style: TextStyle(color: Colors.red),),
               onPressed: (){
                 User.isLogin().then((verify){
                   if(verify){

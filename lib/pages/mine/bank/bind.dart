@@ -4,16 +4,12 @@ import '../../../config/api.dart';
 import '../../../common/http.dart';
 import '../../../common/user.dart';
 import '../../../common/loading.dart';
-import 'list.dart';
 
 class BankBind extends StatefulWidget{
   State<StatefulWidget> createState() => new BankBindState();
 }
 
-class BankBindState extends State with AutomaticKeepAliveClientMixin{
-  @override
-  bool get wantKeepAlive => true;
-
+class BankBindState extends State{
   //数据控制字段
   GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
   Map <String, dynamic>_data = {'memtruename': '', 'membankcard': '', 'membankname': '', 'membankaddress': ''};

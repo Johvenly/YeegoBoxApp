@@ -49,9 +49,9 @@ class RTaskState extends State<RTask> with SingleTickerProviderStateMixin,Automa
 
   //初始化界面数据
   Future<dynamic> initData() async{
-    await User.isLogin().then((_) async{
+    User.isLogin().then((_) async{
       if(_){
-        await User.getAccountToken().then((token) async{
+        User.getAccountToken().then((token) async{
           setState(() {
             _token = token;
           });

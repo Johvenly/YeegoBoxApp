@@ -23,6 +23,9 @@ class API{
   // 初始化会员数据接口
   static const String initUser = apiurl + r'/user/init.html';
 
+  // 初始化会员数据接口
+  static const String subUser = apiurl + r'/user/sub.html';
+
   // 会员修改密码接口
   static const String updatePassword = apiurl + r'/user/updatePassword.html';
 

@@ -50,6 +50,20 @@ class User{
     return token;
   }
 
+  //设置单个字段方法
+  static Future<dynamic> saveFieldForString(String field, String value) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString(field, value);
+    return true;
+  }
+
+  //设置单个字段方法
+  static Future<dynamic> saveFieldForDouble(String field, double value) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setDouble(field, value);
+    return true;
+  }
+
   //删除登录Token方法
   static Future<dynamic> delAccountToken() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
