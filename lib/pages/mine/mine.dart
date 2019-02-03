@@ -102,7 +102,9 @@ class MineState extends State with AutomaticKeepAliveClientMixin{
                     Navigator.of(super.context).push(
                       new MaterialPageRoute(
                           builder: (BuildContext context) => new Account()),
-                    );
+                    ).then((_){
+                      initData();
+                    });
                   },
                 ) : 
                 new GestureDetector(

@@ -10,7 +10,10 @@ class BankList extends StatefulWidget{
   State<StatefulWidget> createState() => new BankListState();
 }
 
-class BankListState extends State{
+class BankListState extends State with AutomaticKeepAliveClientMixin{
+  @override
+  bool get wantKeepAlive => true;
+
   //数据控制字段
   bool _loaded = false;
   List list = new List();                               //列表数据
@@ -49,6 +52,7 @@ class BankListState extends State{
         return true;
       }
     });
+    print('BankList初始化');
   }
 
   @override

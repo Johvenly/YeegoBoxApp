@@ -77,7 +77,14 @@ class AccountState extends State with AutomaticKeepAliveClientMixin{
                   Navigator.of(super.context).push(
                         new MaterialPageRoute(
                             builder: (BuildContext context) => new UserAvatar()),
-                      );
+                      ).then((_){
+                        if(_ != null){
+                          setState((){
+                            _userInfo[User.FIELD_AVATAR] = _;
+                          });
+                          User.saveFieldForString(User.FIELD_AVATAR, _);
+                        }
+                      });
                 }
               ),
               new Divider(),

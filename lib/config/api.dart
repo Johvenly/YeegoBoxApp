@@ -3,7 +3,7 @@
 
 class API{
   //站点资源根目录
-  static const String host = r'http://www.yeegobox.cn';
+  static const String host = r'http://www.yeegobox.com';
 
   // 接口根url
   static const String apiurl = r'http://api.yeegobox.com';
@@ -25,6 +25,9 @@ class API{
 
   // 初始化会员数据接口
   static const String subUser = apiurl + r'/user/sub.html';
+
+  // 上传头像接口
+  static const String uploadAvatar = apiurl + r'/user/avatar.html';
 
   // 会员修改密码接口
   static const String updatePassword = apiurl + r'/user/updatePassword.html';

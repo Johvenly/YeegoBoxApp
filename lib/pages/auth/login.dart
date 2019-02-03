@@ -40,10 +40,8 @@ class LoginState extends State<Login>{
     }
 
     Widget _body = new Container(
-      child: new Column(
-        mainAxisSize: MainAxisSize.max,
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+      child: new ListView(
+        padding: EdgeInsets.all(0),
         children: <Widget>[
           new Stack(
             children: <Widget>[
@@ -129,42 +127,42 @@ class LoginState extends State<Login>{
           ),
 
           //第三方登录列表
-          new Padding(
-            padding: EdgeInsets.only(left: 45, right: 45, top: 60),
-            child: new Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: <Widget>[
-                new GestureDetector(
-                  child: new CircleAvatar(
-                    radius: 30,
-                    backgroundColor: Colors.black54,
-                    child: Icon(FontAwesomeIcons.qq, color: Colors.white, size: 26,),
-                  ),
-                ),
-                new GestureDetector(
-                  child: new CircleAvatar(
-                    radius: 30,
-                    backgroundColor: Colors.black54,
-                    child: Icon(FontAwesomeIcons.weixin, color: Colors.white, size: 26,),
-                  ),
-                ),
-                new GestureDetector(
-                  child: new CircleAvatar(
-                    radius: 30,
-                    backgroundColor: Colors.black54,
-                    child: Icon(FontAwesomeIcons.facebookF, color: Colors.white, size: 26,),
-                  ),
-                ),
-                new GestureDetector(
-                  child: new CircleAvatar(
-                    radius: 30,
-                    backgroundColor: Colors.black54,
-                    child: Icon(FontAwesomeIcons.twitter, color: Colors.white, size: 26,),
-                  ),
-                ),
-              ],
-            ),
-          ),
+          // new Padding(
+          //   padding: EdgeInsets.only(left: 45, right: 45, top: 60),
+          //   child: new Row(
+          //     mainAxisAlignment: MainAxisAlignment.spaceAround,
+          //     children: <Widget>[
+          //       new GestureDetector(
+          //         child: new CircleAvatar(
+          //           radius: 30,
+          //           backgroundColor: Colors.black54,
+          //           child: Icon(FontAwesomeIcons.qq, color: Colors.white, size: 26,),
+          //         ),
+          //       ),
+          //       new GestureDetector(
+          //         child: new CircleAvatar(
+          //           radius: 30,
+          //           backgroundColor: Colors.black54,
+          //           child: Icon(FontAwesomeIcons.weixin, color: Colors.white, size: 26,),
+          //         ),
+          //       ),
+          //       new GestureDetector(
+          //         child: new CircleAvatar(
+          //           radius: 30,
+          //           backgroundColor: Colors.black54,
+          //           child: Icon(FontAwesomeIcons.facebookF, color: Colors.white, size: 26,),
+          //         ),
+          //       ),
+          //       new GestureDetector(
+          //         child: new CircleAvatar(
+          //           radius: 30,
+          //           backgroundColor: Colors.black54,
+          //           child: Icon(FontAwesomeIcons.twitter, color: Colors.white, size: 26,),
+          //         ),
+          //       ),
+          //     ],
+          //   ),
+          // ),
         ],
       )
     );
