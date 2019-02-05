@@ -259,12 +259,9 @@ class HomeState extends State with AutomaticKeepAliveClientMixin{
               autofocus: true,
               focusNode: _focusNode,
               onTap: (){
-                if(_focusNode.hasFocus){
-                  print('sfsf');
-                }
                 // FocusScope.of(context).setFirstFocus(_focusNode);
                 // FocusScope.of(context).reparentIfNeeded(_focusNode);
-                FocusScope.of(context).requestFocus(_focusNode);
+                // FocusScope.of(context).requestFocus(_focusNode);
                 print('地点收拾收拾');
               },
             ),

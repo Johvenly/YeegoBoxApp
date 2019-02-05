@@ -4,6 +4,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../auth/login.dart';
 import '../../config/api.dart';
+import '../../common/http.dart';
 import '../../common/user.dart';
 import '../../common/loading.dart';
 import '../home/notice/notice.dart';
@@ -12,6 +13,7 @@ import 'resetpassword/resetpassword.dart';
 import 'wallet/wallet.dart';
 import 'bank/list.dart';
 import 'account/account.dart';
+import 'proof/proof.dart';
 
 class Mine extends StatefulWidget{
   State<StatefulWidget> createState() => new MineState();
@@ -25,6 +27,8 @@ class MineState extends State with AutomaticKeepAliveClientMixin{
   bool _login = false;
   bool _loaded = true;
   Map<String, dynamic> _userInfo;
+  String _token;
+  List _proof;
 
   @override
     void initState() {
@@ -60,7 +64,15 @@ class MineState extends State with AutomaticKeepAliveClientMixin{
         await User.getUserInfo().then((result){
           setState(() {
             _userInfo = result;
+            _token = result[User.FIELD_TOKEN];
           });
+        });
+        await Http.post(API.memberProof, data: {'account_token': _token}).then((result){
+          if(result['code'] == 1){
+            setState(() {
+              _proof = result['data'];
+            });
+          }
         });
       }else{
         setState(() {
@@ -221,6 +233,7 @@ class MineState extends State with AutomaticKeepAliveClientMixin{
               mainAxisAlignment: MainAxisAlignment.spaceAround,
             ),
           ),
+          _login && _proof != null ?
           new ClipPath(
             clipper: TopClipper(),
             child: new Container(
@@ -230,62 +243,46 @@ class MineState extends State with AutomaticKeepAliveClientMixin{
               ),
               child: new Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: <Widget>[
-                  new Column(
+                children: _proof.map<Widget>((row){
+                  return new Column(
                     children: <Widget>[
                       new SizedBox(
-                        width: 80,
                         height: 25,
-                        child: new FlatButton(
+                        child: (row['value'] == null) ? new FlatButton(
                           child: Text('绑定账号', style: TextStyle(color: Colors.white, fontSize: 12),),
                           color: Colors.green,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.all(Radius.circular(20))
                           ),
-                          onPressed: (){},
-                        ),
+                          onPressed: (){
+                            if(_login){
+                              Navigator.of(context).push(
+                                new MaterialPageRoute(
+                                    builder: (BuildContext context) => new Proof(type: row['id'],))
+                              ).then((_){
+                                if(_ != null){
+                                  int index = _proof.indexOf(row);
+                                  setState(() {
+                                    _proof[index]['value'] = _;
+                                  });
+                                }
+                              });
+                            }else{
+                              Navigator.of(super.context).push(
+                                new MaterialPageRoute(
+                                    builder: (BuildContext context) => new Login(), fullscreenDialog: true),
+                              );
+                            }
+                          },
+                        ): Text(row['value'], style: TextStyle(height: 1.2),),
                       ),
-                      Text('淘宝号', style:TextStyle(height:1.5, color: Colors.black54))
+                      Text(row['name'] + '号', style:TextStyle(height:1.5, color: Colors.black54))
                     ],
-                  ),
-                  new Column(
-                    children: <Widget>[
-                      new SizedBox(
-                        width: 80,
-                        height: 25,
-                        child: new FlatButton(
-                          child: Text('绑定账号', style: TextStyle(color: Colors.white, fontSize: 12),),
-                          color: Colors.green,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(20))
-                          ),
-                          onPressed: (){},
-                        ),
-                      ),
-                      Text('京东号', style:TextStyle(height:1.5, color: Colors.black54))
-                    ],
-                  ),
-                  new Column(
-                    children: <Widget>[
-                      new SizedBox(
-                        width: 80,
-                        height: 25,
-                        child: new FlatButton(
-                          child: Text('绑定账号', style: TextStyle(color: Colors.white, fontSize: 12),),
-                          color: Colors.green,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(20))
-                          ),
-                          onPressed: (){},
-                        ),
-                      ),
-                      Text('拼多多号', style:TextStyle(height:1.5, color: Colors.black54))
-                    ],
-                  ),
-                ],
+                  );
+                }).toList(),
               ),
             ),
-          ),
+          ) : new Container(),
           new Container(
             child: new Column(
               children: <Widget>[

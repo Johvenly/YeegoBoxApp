@@ -61,4 +61,16 @@ class API{
 
   // 提现接口
   static const String withdraw = apiurl + r'/wallet/withdraw.html';
+
+  // 获取会员第三方账号绑定详情
+  static const String memberProof = apiurl + r'/proof/index.html';
+
+  // 获取会员第三方账号绑定字段
+  static const String proofFields = apiurl + r'/proof/field.html';
+
+  // 上传认证凭据接口
+  static const String uploadProofImage = apiurl + r'/proof/uploadImage.html';
+
+  // 提交绑定数据
+  static const String proofBind = apiurl + r'/proof/bind.html';
 }

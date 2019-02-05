@@ -233,7 +233,7 @@ class BankBindState extends State{
             },
           ),
         ),
-        body: !_loaded ? new LoadingView() :_body,
+        body: _body,
       ),
     );
   }

@@ -96,7 +96,7 @@ class UserAvatarState extends State<UserAvatar>{
                             new GestureDetector(
                               behavior: HitTestBehavior.translucent,
                               child: Padding(
-                                padding: EdgeInsets.only(top: 15, bottom: 10),
+                                padding: EdgeInsets.only(top: 10, bottom: 10),
                                 child: new FractionallySizedBox(
                                   widthFactor: 1,
                                   child: Text('从手机相册选择', style: TextStyle(fontSize: 18), textAlign: TextAlign.center,),
@@ -111,7 +111,7 @@ class UserAvatarState extends State<UserAvatar>{
                             new GestureDetector(
                               behavior: HitTestBehavior.translucent,
                               child: Padding(
-                                padding: EdgeInsets.only(top: 15, bottom: 15),
+                                padding: EdgeInsets.only(top: 10, bottom: 15),
                                 child: Text('保存图片', style: TextStyle(fontSize: 18),),
                               ),
                             ),
