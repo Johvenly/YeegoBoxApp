@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import '../../config/api.dart';
@@ -35,11 +34,10 @@ class HomeState extends State with AutomaticKeepAliveClientMixin{
       {'classid': 5, 'pic': 'assets/images/logo_pdd.jpg', 'stock': 0},
     ];
     int _releaseSelectClassID = 1;          //当前选择使用任务平台ID
+    int _browseCount = 0;
     Map _userinfo = new Map();              //用户信息
     String _token;                          //登录Token
     TextEditingController _priceController = new TextEditingController();
-    FocusNode _focusNode;
-    FocusScopeNode _focusScopeNode = new FocusScopeNode();
 
   //初始化控件状态
   @override
@@ -50,16 +48,9 @@ class HomeState extends State with AutomaticKeepAliveClientMixin{
           _loaded = true;
         });
       });
-      _focusNode = new FocusNode();
-      _focusNode.addListener((){
-        print(_focusNode.hasFocus);
+      UserEvent.eventBus.on<UserEvent>().listen((_){
+        initData();
       });
-    }
-
-  @override
-    void dispose(){
-      super.dispose();
-      _focusNode.dispose();
     }
 
   //初始化界面数据
@@ -71,6 +62,11 @@ class HomeState extends State with AutomaticKeepAliveClientMixin{
         });
       }
     });
+    await initLoginData();
+    print('Home界面数据初始化...');
+  }
+
+  Future<dynamic> initLoginData() async{
     await User.isLogin().then((_) async{
       if(_){
         await User.getAccountToken().then((token) async{
@@ -96,18 +92,25 @@ class HomeState extends State with AutomaticKeepAliveClientMixin{
               });
             }
           });
+          // 加载浏览任务统计数据
+          await Http.post(API.getBrowseCount, data: {'account_token': token}).then((result){
+            if(result['code'] == 1){
+              setState((){
+                _browseCount = result['data'];
+              });
+            }
+          });
+        });
+      }else{
+        setState(() {   
+          _token = null;
         });
       }
     });
-    print('Home界面数据初始化...');
   }
   
   @override
   Widget build(BuildContext context){
-    // FocusScope.of(context).setFirstFocus(_focusScopeNode);
-    // FocusScope.of(context).reparentIfNeeded(_focusNode);
-    // FocusScope.of(super.context).requestFocus(_focusNode);
-    // FocusScope.of(context).setFirstFocus(new FocusScopeNode());
     Widget _body = new Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -241,32 +244,6 @@ class HomeState extends State with AutomaticKeepAliveClientMixin{
               }).toList(),
             ),
           ),
-          (_releaseSelectClassID != 5) ?
-          new Padding(
-            padding: EdgeInsets.only(left: 25, right: 25, bottom: 8),
-            child: new TextField(
-              controller: _priceController,
-              decoration: InputDecoration(
-                contentPadding: EdgeInsets.only(top: 15, bottom: 15, left: 15, right: 15),
-                hintText: '输入您能垫付的最大金额',
-                hintStyle: TextStyle(color: Colors.grey[300]),
-                suffixText: '元',
-                suffixStyle: TextStyle(color: Colors.black),
-                enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.grey[300])),
-                focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.green),),
-              ),
-              enabled: true,
-              cursorColor: Colors.green,
-              autofocus: true,
-              focusNode: _focusNode,
-              onTap: (){
-                // FocusScope.of(context).setFirstFocus(_focusNode);
-                // FocusScope.of(context).reparentIfNeeded(_focusNode);
-                // FocusScope.of(context).requestFocus(_focusNode);
-                print('地点收拾收拾');
-              },
-            ),
-          ) : new Container(),
           new Padding(
             padding: EdgeInsets.only(top: 15, bottom: 15, left: 25, right: 25),
               child: new FlatButton(
@@ -284,24 +261,111 @@ class HomeState extends State with AutomaticKeepAliveClientMixin{
                     );
                     return;
                   }
-                  if((_priceController.text == '' || double.parse(_priceController.text) <= 0) && _releaseSelectClassID != 5){
-                    Fluttertoast.showToast(msg: '请输入您能垫付的最大金额', gravity: ToastGravity.CENTER);
+                  if(_releaseSelectClassID == 5){
+                    // 提交任务申请
+                    Http.post(API.getRelease, data: {'account_token': _token, 'type': _releaseSelectClassID}).then((result){
+                      if(result['code'] == 1){
+                        Fluttertoast.showToast(msg: result['msg'], gravity: ToastGravity.CENTER).then((_) async{
+                          await Navigator.of(super.context).push(
+                            new MaterialPageRoute(
+                                builder: (BuildContext context) => new RDetail(id: int.parse(result['data']))),
+                          ).then((_){
+                              initLoginData();
+                            });
+                        });
+                      }else{
+                        Fluttertoast.showToast(msg: result['msg'], gravity: ToastGravity.CENTER);
+                      }
+                    });
                     return;
                   }
-                  double price = _releaseSelectClassID == 5 ? 0.00 : double.parse(_priceController.text);
-                  // 提交任务申请
-                  Http.post(API.getRelease, data: {'account_token': _token, 'type': _releaseSelectClassID, 'price': price}).then((result){
-                    if(result['code'] == 1){
-                      Fluttertoast.showToast(msg: result['msg'], gravity: ToastGravity.CENTER).then((_) async{
-                        await Navigator.of(super.context).push(
-                          new MaterialPageRoute(
-                              builder: (BuildContext context) => new RDetail(id: int.parse(result['data']))),
+                  showDialog<Null>(
+                      context: context,
+                      barrierDismissible: false,
+                      builder: (BuildContext context) {
+                        return new SimpleDialog(
+                          title: new Text('接受垫付的最大金额', style: TextStyle(fontWeight: FontWeight.w100, color: Colors.green, fontSize: 16),),
+                          titlePadding: EdgeInsets.all(8),
+                          contentPadding: EdgeInsets.all(0),
+                          children: <Widget>[
+                            new Container(
+                              margin: EdgeInsets.all(15),
+                              child: new TextField(
+                                  controller: _priceController,
+                                  decoration: InputDecoration(
+                                    contentPadding: EdgeInsets.only(top: 15, bottom: 15, left: 8, right: 15),
+                                    hintText: '输入您能垫付的最大金额',
+                                    hintStyle: TextStyle(color: Colors.grey[300]),
+                                    suffixText: '元',
+                                    suffixStyle: TextStyle(color: Colors.black),
+                                    enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.grey[300])),
+                                    focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.green),),
+                                  ),
+                                  enabled: true,
+                                  cursorColor: Colors.green,
+                                  autofocus: true,
+                                  keyboardType: TextInputType.number,
+                              ),
+                            ),
+                            new Container(
+                              margin: EdgeInsets.only(top: 3),
+                              color: Colors.grey[200],
+                              child: new Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                children: <Widget>[
+                                  new Expanded(
+                                    flex: 1,
+                                    child: new GestureDetector(
+                                      behavior: HitTestBehavior.translucent,
+                                      child: new Container(
+                                        padding: EdgeInsets.all(15),
+                                        child: new Text('取消', textAlign: TextAlign.center,),
+                                      ),
+                                      onTap: (){
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
+                                  ),
+                                  new Expanded(
+                                    flex: 1,
+                                    child: new GestureDetector(
+                                      child: new Container(
+                                        padding: EdgeInsets.all(15),
+                                        color: Colors.green,
+                                        child: Text('确定', style: TextStyle(color: Colors.white), textAlign: TextAlign.center,),
+                                      ),
+                                      onTap: (){
+                                        if((_priceController.text == '' || double.parse(_priceController.text) <= 0)){
+                                          Fluttertoast.showToast(msg: '请输入您能垫付的最大金额', gravity: ToastGravity.CENTER);
+                                          return;
+                                        }
+                                        double price = double.parse(_priceController.text);
+                                        // 提交任务申请
+                                        Http.post(API.getRelease, data: {'account_token': _token, 'type': _releaseSelectClassID, 'price': price}).then((result){
+                                          if(result['code'] == 1){
+                                            Fluttertoast.showToast(msg: result['msg'], gravity: ToastGravity.CENTER).then((_) async{
+                                              await Navigator.of(super.context).push(
+                                                new MaterialPageRoute(
+                                                    builder: (BuildContext context) => new RDetail(id: int.parse(result['data']))),
+                                              ).then((_){
+                                                initLoginData();
+                                              });
+                                            });
+                                          }else{
+                                            Fluttertoast.showToast(msg: result['msg'], gravity: ToastGravity.CENTER);
+                                          }
+                                        });
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                          ],
                         );
-                      });
-                    }else{
-                      Fluttertoast.showToast(msg: result['msg'], gravity: ToastGravity.CENTER);
-                    }
-                  });
+                      },
+                  );
                 },
                 child: Text('接受任务', style: new TextStyle(color: Colors.white, fontSize: 16.0),
               )
@@ -324,7 +388,7 @@ class HomeState extends State with AutomaticKeepAliveClientMixin{
                       Text(' 浏览任务'),
                     ],
                   ),
-                  Text('（机会：0）', style: TextStyle(color: Colors.grey),),
+                  Text('（机会：'+ _browseCount.toString() +'）', style: TextStyle(color: Colors.grey),),
                 ],
               ),
             ),

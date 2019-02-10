@@ -56,6 +56,10 @@ class BTaskState extends State<BTask> with SingleTickerProviderStateMixin,Automa
             _token = token;
           });
         });
+      }else{
+        setState(() {
+            _token = null;
+          });
       }
     });
     print('BTask界面数据初始化...');

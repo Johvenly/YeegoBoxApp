@@ -13,6 +13,7 @@ import 'resetpassword/resetpassword.dart';
 import 'wallet/wallet.dart';
 import 'bank/list.dart';
 import 'account/account.dart';
+import 'account/truecheck.dart';
 import 'proof/proof.dart';
 
 class Mine extends StatefulWidget{
@@ -318,20 +319,36 @@ class MineState extends State with AutomaticKeepAliveClientMixin{
                   },
                 ),
                 new Divider(indent: 5, height: 0, color: Colors.grey[200]),
-                new Container(
-                  child: new Row(
-                    children: <Widget>[
-                      Row(
-                        children: <Widget>[
-                          Icon(FontAwesomeIcons.idCard, size: 18, color: Colors.black45,),
-                          Text('  真实性验证', style: TextStyle(fontSize: 16),)
-                        ],
-                      ),
-                      Icon(Icons.chevron_right, color: Colors.grey,)
-                    ],
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                new GestureDetector(
+                  behavior: HitTestBehavior.translucent,
+                  child: new Container(
+                    child: new Row(
+                      children: <Widget>[
+                        Row(
+                          children: <Widget>[
+                            Icon(FontAwesomeIcons.idCard, size: 18, color: Colors.black45,),
+                            Text('  真实性验证', style: TextStyle(fontSize: 16),)
+                          ],
+                        ),
+                        Icon(Icons.chevron_right, color: Colors.grey,)
+                      ],
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    ),
+                    padding: EdgeInsets.only(top: 15, bottom: 15, left: 5, right: 8),
                   ),
-                  padding: EdgeInsets.only(top: 15, bottom: 15, left: 5, right: 8),
+                  onTap: (){
+                    if(_login){
+                      Navigator.of(context).push(
+                        new MaterialPageRoute(
+                            builder: (BuildContext context) => new Truecheck())
+                      );
+                    }else{
+                      Navigator.of(context).push(
+                        new MaterialPageRoute(
+                            builder: (BuildContext context) => new Login(), fullscreenDialog: true),
+                      );
+                    }
+                  },
                 ),
                 new Divider(indent: 5, height: 0, color: Colors.grey[200]),
                 new GestureDetector(

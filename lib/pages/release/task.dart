@@ -56,6 +56,10 @@ class RTaskState extends State<RTask> with SingleTickerProviderStateMixin,Automa
             _token = token;
           });
         });
+      }else{
+        setState(() {
+            _token = null;
+          });
       }
     });
     print('RTask界面数据初始化...');

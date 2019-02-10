@@ -17,6 +17,9 @@ class API{
   // 获取公告详情，必须参数：id(int)
   static const String getNoticeDetail = apiurl + r'/notice/detail.html';
 
+  // 获取轮播图插件
+  static const String getSlideShow = apiurl + r'/home/slideshow.html';
+
   // 会员登录接口，必须参数：username(String),password(String)
   static const String login = apiurl + r'/auth/login.html';
 
@@ -40,6 +43,9 @@ class API{
 
   // 上传头像接口
   static const String uploadAvatar = apiurl + r'/user/avatar.html';
+
+  // 提交身份认证信息，必要参数：account_token(String), type(String)
+  static const String truecheck = apiurl + r'/user/truecheck.html';
 
   // 会员修改密码接口
   static const String updatePassword = apiurl + r'/user/updatePassword.html';

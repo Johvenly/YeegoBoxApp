@@ -17,7 +17,6 @@ class AccountState extends State with AutomaticKeepAliveClientMixin{
 
   //数据控制字段
   bool _loaded = false;
-  List list = new List();                               //列表数据
   Map _userInfo;
 
   @override
@@ -204,7 +203,7 @@ class AccountState extends State with AutomaticKeepAliveClientMixin{
             },
           ),
         ),
-        body: !_loaded ? new LoadingView() : _body,
+        body: _body,
       ),
     );
   }
