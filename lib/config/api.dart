@@ -20,6 +20,18 @@ class API{
   // 会员登录接口，必须参数：username(String),password(String)
   static const String login = apiurl + r'/auth/login.html';
 
+  // 会员注册接口，必须参数：step(int), 表单列表
+  static const String register = apiurl + r'/auth/register.html';
+
+  // 发送短信验证码接口
+  static const String sendMessage = apiurl + r'/auth/sendMessage.html';
+
+  // 获取省份列表
+  static const String getProvinces = apiurl + r'/auth/getProvinces.html';
+
+  // 上次注册身份照片
+  static const String uploadPhoto = apiurl + r'/auth/uploadPhoto.html';
+
   // 初始化会员数据接口
   static const String initUser = apiurl + r'/user/init.html';
 
@@ -49,6 +61,24 @@ class API{
 
   // 验证试用任务接口，必须参数：id(int),account_token(String),shopname(String)
   static const String checkRelease  = apiurl + r'/release/check.html';
+
+  // 浏览任务数量接口，必须参数：account_token(String)，
+  static const String getBrowseCount = apiurl + r'/browse/count.html';
+
+  // 浏览任务列表接口，必须参数：account_token(String)，
+  static const String getBrowseList = apiurl + r'/browse/index.html';
+
+  // 获取浏览任务接口，必须参数：classid(int),account_token(String)，可选参数：price(int)
+  static const String getBrowse = apiurl + r'/browse/get.html';
+
+  // 浏览任务详情接口，必须参数：id(int),account_token(String)
+  static const String getBrowseDetail = apiurl + r'/browse/detail.html';
+
+  // 取消浏览任务接口，必须参数：id(int),account_token(String)
+  static const String cancelBrowse  = apiurl + r'/browse/cancel.html';
+
+  // 验证浏览任务接口，必须参数：id(int),account_token(String),shopname(String)
+  static const String checkBrowse  = apiurl + r'/browse/check.html';
 
   // 获取银行卡列表接口
   static const String getBankList = apiurl + r'/wallet/banklist.html';

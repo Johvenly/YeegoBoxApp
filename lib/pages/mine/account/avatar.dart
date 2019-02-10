@@ -149,11 +149,9 @@ class UserAvatarState extends State<UserAvatar>{
             child: new ClipOval(
               child: new AspectRatio(
                 aspectRatio: 1,
-                child: (_avatar != null) ? new CachedNetworkImage(imageUrl: API.host + _avatar, fit: BoxFit.cover) : Image.asset('assets/images/avatar.jpg', fit: BoxFit.cover),
+                child: (_avatar != null && _avatar != '') ? new CachedNetworkImage(imageUrl: API.host + _avatar, fit: BoxFit.cover) : Image.asset('assets/images/avatar.jpg', fit: BoxFit.cover),
               ),
             ),
-            // child: new CircleAvatar(backgroundColor: Colors.green ,backgroundImage: (_avatar != null) ? new CachedNetworkImageProvider(API.host + _avatar)
-            //       : new AssetImage('assets/images/avatar.jpg')),
           )
         ),
       ),

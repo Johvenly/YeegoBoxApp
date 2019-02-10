@@ -102,7 +102,7 @@ class MineState extends State with AutomaticKeepAliveClientMixin{
                 child: _login ? new GestureDetector(
                   child: new Column(
                     children: <Widget>[
-                      new CircleAvatar(backgroundColor: Colors.green ,backgroundImage: (_userInfo[User.FIELD_AVATAR] != null) ? new CachedNetworkImageProvider(API.host + _userInfo[User.FIELD_AVATAR])
+                      new CircleAvatar(backgroundColor: Colors.green ,backgroundImage: (_userInfo[User.FIELD_AVATAR] != '' && _userInfo[User.FIELD_AVATAR] != null) ? new CachedNetworkImageProvider(API.host + _userInfo[User.FIELD_AVATAR])
                            : new AssetImage('assets/images/avatar.jpg'), radius: 50),
                       new Container(
                         child: Text(_userInfo[User.FIELD_MOBILE], style: TextStyle(color: Colors.white, fontSize: 16, height: 1.5),),

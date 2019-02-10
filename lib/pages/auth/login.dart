@@ -4,6 +4,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import '../../config/api.dart';
 import '../../common/http.dart';
 import '../../common/user.dart';
+import 'register.dart';
 
 class Login extends StatefulWidget{
   State<StatefulWidget> createState() => new LoginState();
@@ -107,7 +108,12 @@ class LoginState extends State<Login>{
               padding: EdgeInsets.only(top:25, left: 45, right: 45),
               child: Text('没有账号？马上注册', textAlign: TextAlign.end,),
             ),
-            onTap: null,
+            onTap: (){
+              Navigator.of(super.context).push(
+                new MaterialPageRoute(
+                    builder: (BuildContext context) => new Register()),
+              );
+            },
           ),
           new Container(
             margin: EdgeInsets.only(top: 45),

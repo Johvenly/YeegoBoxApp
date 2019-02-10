@@ -64,7 +64,7 @@ class AccountState extends State with AutomaticKeepAliveClientMixin{
                       Text('头像', style: TextStyle(fontSize: 16),),
                       Row(
                         children: <Widget>[
-                          new CircleAvatar(backgroundColor: Colors.green ,backgroundImage: (_userInfo[User.FIELD_AVATAR] != null) ? new CachedNetworkImageProvider(API.host + _userInfo[User.FIELD_AVATAR])
+                          new CircleAvatar(backgroundColor: Colors.green ,backgroundImage: (_userInfo[User.FIELD_AVATAR] != '' && _userInfo[User.FIELD_AVATAR] != null) ? new CachedNetworkImageProvider(API.host + _userInfo[User.FIELD_AVATAR])
                            : new AssetImage('assets/images/avatar.jpg'), radius: 35),
                           Icon(Icons.chevron_right, color: Colors.grey,),
                         ],

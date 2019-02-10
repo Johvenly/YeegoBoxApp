@@ -10,6 +10,7 @@ import 'notice/notice.dart';
 import 'notice/detail.dart';
 import '../auth/login.dart';
 import '../release/detail.dart';
+import '../browse/detail.dart';
 
 class Home extends StatefulWidget{
   @override
@@ -338,8 +339,26 @@ class HomeState extends State with AutomaticKeepAliveClientMixin{
                   borderRadius: BorderRadius.all(Radius.circular(8)),
                 ),
                 onPressed: () {
-                  // _postLogin(
-                  //     _userNameController.text, _userPassController.text);
+                  if(_token == null){
+                    Navigator.of(super.context).push(
+                      new MaterialPageRoute(
+                          builder: (BuildContext context) => new Login(), fullscreenDialog: true),
+                    );
+                    return;
+                  }
+                  // 提交任务申请
+                  Http.post(API.getBrowse, data: {'account_token': _token}).then((result){
+                    if(result['code'] == 1){
+                      Fluttertoast.showToast(msg: result['msg'], gravity: ToastGravity.CENTER).then((_) async{
+                        await Navigator.of(super.context).push(
+                          new MaterialPageRoute(
+                              builder: (BuildContext context) => new BDetail(id: int.parse(result['data']))),
+                        );
+                      });
+                    }else{
+                      Fluttertoast.showToast(msg: result['msg'], gravity: ToastGravity.CENTER);
+                    }
+                  });
                 },
                 child: Text('接受任务', style: new TextStyle(color: Colors.white, fontSize: 16.0),
               )
