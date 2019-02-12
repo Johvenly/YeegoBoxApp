@@ -33,7 +33,7 @@ class NoticeDetailState extends State<NoticeDetail>{
     }
 
   Future<dynamic> initData() async{
-    await Http.post(API.getNoticeDetail, data: {'id': widget.id}).then((result){
+    await Http.get(API.getNoticeDetail, data: {'id': widget.id.toString()}).then((result){
       if(result['code'] == 1){
         setState(() {
           row = result['data'];
