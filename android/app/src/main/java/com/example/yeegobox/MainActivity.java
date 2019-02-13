@@ -1,4 +1,4 @@
-package com.example.yeegobox;
+package com.yeegobox.www;
 
 import android.os.Bundle;
 import io.flutter.app.FlutterActivity;

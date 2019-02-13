@@ -157,7 +157,7 @@ class RegisterState extends State<Register>{
                   key: _formFristKey,
                   child: new ListView(
                     shrinkWrap: true,
-                    padding: EdgeInsets.all(0),
+                    padding: EdgeInsets.only(bottom: 25),
                     children: <Widget>[
                       new Padding(
                         padding: EdgeInsets.only(top:15, left: 45, right: 45),
@@ -306,7 +306,7 @@ class RegisterState extends State<Register>{
                   key: _formSecondKey,
                   child: new ListView(
                     shrinkWrap: true,
-                    padding: EdgeInsets.all(0),
+                    padding: EdgeInsets.only(bottom: 25),
                     children: <Widget>[
                       new Padding(
                         padding: EdgeInsets.only(top:15, left: 45, right: 45),

@@ -8,7 +8,7 @@ class Http{
   //Post请求方法
   static Future<dynamic> post(String url, {Map<String, dynamic> data}) async{
     Dio dio = new Dio();
-    dio.options.connectTimeout = 5000; //5s
+    dio.options.connectTimeout = 8000; //5s
     dio.options.receiveTimeout = 3000;
     try {
       Response response = await dio.post(url, data: data);      //发起请求
@@ -20,6 +20,7 @@ class Http{
       }                       //返回结果
     } on DioError catch(e) {
         print(e);
+        return {'code': 0, 'msg': '网络开了小差或请求超时'};
     }
   }
 

@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'detail.dart';
 import '../../config/api.dart';
 import '../../common/http.dart';
@@ -81,8 +80,9 @@ class BTaskState extends State<BTask> with SingleTickerProviderStateMixin,Automa
     return !_loaded ? new LoadingView() : Scaffold(
       appBar: AppBar(
         elevation: 0,
+        centerTitle: true,
         backgroundColor: Colors.green,
-        title: Text('试客任务'),
+        title: Text('浏览任务'),
         bottom: _token != null ? new TabBar(
           controller: _tabController,
           indicatorColor: Colors.white,

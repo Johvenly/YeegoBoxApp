@@ -47,7 +47,9 @@ class ResetPasswordState extends State{
             Navigator.pushAndRemoveUntil(context,
                 new MaterialPageRoute(
               builder: (BuildContext context) => new Login(), fullscreenDialog: true,
-            ), ModalRoute.withName('/'));
+            ), ModalRoute.withName('/')).then((_){
+              Navigator.pop(context);
+            });
           });
         }else{
           Fluttertoast.showToast(msg: result['msg'], gravity: ToastGravity.CENTER);

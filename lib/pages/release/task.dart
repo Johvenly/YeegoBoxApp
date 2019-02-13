@@ -81,6 +81,7 @@ class RTaskState extends State<RTask> with SingleTickerProviderStateMixin,Automa
     return !_loaded ? new LoadingView() : Scaffold(
       appBar: AppBar(
         elevation: 0,
+        centerTitle: true,
         backgroundColor: Colors.green,
         title: Text('试客任务'),
         bottom: _token != null ? new TabBar(

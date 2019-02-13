@@ -144,7 +144,7 @@ class HomeState extends State with AutomaticKeepAliveClientMixin{
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     _token != null ?
-                    Text(_userinfo['release'].toString(), style: TextStyle(fontSize: 20,),) :
+                    Text(_userinfo['release'].toString() ?? '0', style: TextStyle(fontSize: 20,),) :
                     Icon(Icons.insert_drive_file, color: Colors.black54,),
                     Text('试用报告', style: TextStyle(height: 1.5),),
                   ],
@@ -152,7 +152,7 @@ class HomeState extends State with AutomaticKeepAliveClientMixin{
                 Column(
                   children: <Widget>[
                     _token != null ?
-                    Text(_userinfo['apply'].toString(), style: TextStyle(fontSize: 20,),) :
+                    Text(_userinfo['apply'].toString() ?? '0', style: TextStyle(fontSize: 20,),) :
                     Icon(Icons.group, color: Colors.black54,),
                     Text('邀请好友', style: TextStyle(height: 1.5),),
                   ],
