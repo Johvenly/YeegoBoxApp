@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'index.dart';
+import '../config/api.dart';
+import '../common/user.dart';
+import '../common/http.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -13,36 +16,63 @@ class _SplashScreenState extends State<SplashScreen>
   Animation _animation;
   int _seconds = 3;
   Timer _time;
+  String tips;
+  bool _loaded = false;
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _controller =
         AnimationController(vsync: this, duration: Duration(milliseconds: 500));
     _animation = Tween(begin: 0.0, end: 1.0).animate(_controller);
 
-    _animation.addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        _time = Timer.periodic(Duration(seconds: 1),(timer) {
-          if(_seconds <= 0){
-            timer.cancel();
-            Navigator.pushReplacement( context, MaterialPageRoute(builder: (BuildContext context) => new Index()));
-          }else{
-            setState(() {
-              _seconds --;
-            });
-          }
-        });
-      }
+    initData().then((_){
+      setState(() {
+        _loaded = true;
+      });
+      _animation.addStatusListener((status) {
+        if (status == AnimationStatus.completed) {
+          _time = Timer.periodic(Duration(seconds: 1),(timer) {
+            if(_seconds <= 0){
+              timer.cancel();
+              Navigator.pushReplacement( context, MaterialPageRoute(builder: (BuildContext context) => new Index(tips: tips,)));
+            }else{
+              setState(() {
+                _seconds --;
+              });
+            }
+          });
+        }
+      });
+      _controller.forward();
     });
-    _controller.forward();
   }
 
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
+  }
+
+  //初始化界面数据
+  Future<dynamic> initData() async{
+    await User.isLogin().then((_) async{
+      if(_){
+         await User.getAccountToken().then((token) async{
+          // 认证并初始化会员信息
+          await Http.post(API.initUser, data: {'account_token': token}).then((result) async{
+            if(result['code'] == 1){
+              await User.saveUserInfo(result['data']);
+            }else{
+              await User.delAccountToken();
+              setState(() {
+                tips = '您已在其他地方登录或账号已过期';
+              });
+            }
+          });
+        });
+      }
+    });
   }
 
   @override
@@ -62,7 +92,7 @@ class _SplashScreenState extends State<SplashScreen>
             ),
           ),
         ),
-        new Positioned(
+        _loaded ? new Positioned(
           width: 80,
           height: 30,
           top: 45,
@@ -78,10 +108,10 @@ class _SplashScreenState extends State<SplashScreen>
             ),
             onTap: (){
               _time.cancel();
-              Navigator.pushReplacement( context, MaterialPageRoute(builder: (BuildContext context) => new Index()));
+              Navigator.pushReplacement( context, MaterialPageRoute(builder: (BuildContext context) => new Index(tips: tips,)));
             },
           ),
-        ),
+        ) : new Container(),
       ],
     );
   }
