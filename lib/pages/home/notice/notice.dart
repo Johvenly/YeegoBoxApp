@@ -198,7 +198,7 @@ class _NoticeState extends State<Notice> with TickerProviderStateMixin {
             itemBuilder: _renderRow,
             itemCount: list.length,
           ),
-      ),
+        ),
       ),
     );
   }

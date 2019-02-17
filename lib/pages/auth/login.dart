@@ -131,44 +131,6 @@ class LoginState extends State<Login>{
               child: Text('马上登录', style: new TextStyle(color: Colors.white, fontSize: 16.0),)
             ),
           ),
-
-          //第三方登录列表
-          // new Padding(
-          //   padding: EdgeInsets.only(left: 45, right: 45, top: 60),
-          //   child: new Row(
-          //     mainAxisAlignment: MainAxisAlignment.spaceAround,
-          //     children: <Widget>[
-          //       new GestureDetector(
-          //         child: new CircleAvatar(
-          //           radius: 30,
-          //           backgroundColor: Colors.black54,
-          //           child: Icon(FontAwesomeIcons.qq, color: Colors.white, size: 26,),
-          //         ),
-          //       ),
-          //       new GestureDetector(
-          //         child: new CircleAvatar(
-          //           radius: 30,
-          //           backgroundColor: Colors.black54,
-          //           child: Icon(FontAwesomeIcons.weixin, color: Colors.white, size: 26,),
-          //         ),
-          //       ),
-          //       new GestureDetector(
-          //         child: new CircleAvatar(
-          //           radius: 30,
-          //           backgroundColor: Colors.black54,
-          //           child: Icon(FontAwesomeIcons.facebookF, color: Colors.white, size: 26,),
-          //         ),
-          //       ),
-          //       new GestureDetector(
-          //         child: new CircleAvatar(
-          //           radius: 30,
-          //           backgroundColor: Colors.black54,
-          //           child: Icon(FontAwesomeIcons.twitter, color: Colors.white, size: 26,),
-          //         ),
-          //       ),
-          //     ],
-          //   ),
-          // ),
         ],
       )
     );
@@ -176,7 +138,7 @@ class LoginState extends State<Login>{
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        resizeToAvoidBottomPadding: false,
+        // resizeToAvoidBottomPadding: false,
         body: _body,
       ),
     );

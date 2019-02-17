@@ -320,15 +320,22 @@ class TaskListViewState extends State<TaskListView> with AutomaticKeepAliveClien
   }
 
   Widget build(BuildContext context){
-    return  !_loaded ? _emptyWight : new SmartRefresher(
+    return  new SmartRefresher(
       enablePullDown: true,
-      enablePullUp: (widget.type == 0) ? false : true,
+      enablePullUp: (widget.type == 0 || list.length <= 0) ? false : true,
       controller: _controller,
       onRefresh: _onRefresh,
       headerBuilder: _headerCreate,
       footerBuilder: _footerCreate,
       footerConfig: new RefreshConfig(),
-      child: new ListView.builder(
+      child: !_loaded ? new ListView(
+        children: <Widget>[
+          new Padding(
+            padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 3),
+            child:  _emptyWight,
+          )
+        ],
+      ) : new ListView.builder(
         padding: EdgeInsets.only(top: 8),
         itemBuilder: _renderRow,
         itemCount: list.length,

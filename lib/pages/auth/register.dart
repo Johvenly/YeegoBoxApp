@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
-import 'package:dio/dio.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_picker/flutter_picker.dart';
-import 'package:image_picker/image_picker.dart';
 import '../../config/api.dart';
 import '../../common/http.dart';
 
@@ -452,7 +450,7 @@ class RegisterState extends State<Register>{
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         key: _scaffoldKey,
-        resizeToAvoidBottomPadding: false,
+        // resizeToAvoidBottomPadding: false,
         body: _body,
       ),
     );

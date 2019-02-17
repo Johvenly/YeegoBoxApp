@@ -143,16 +143,11 @@ class AccountState extends State with AutomaticKeepAliveClientMixin{
               new GestureDetector(
                 behavior: HitTestBehavior.translucent,
                 child: new Padding(
-                  padding: EdgeInsets.only(top: 8, bottom: 8, right: 8),
+                  padding: EdgeInsets.only(top: 8, bottom: 8, right: 20),
                   child: new Row(
                     children: <Widget>[
                       Text('QQ', style: TextStyle(fontSize: 16),),
-                      Row(
-                        children: <Widget>[
-                          Text(_userInfo['qq'].toString()),
-                          Icon(Icons.chevron_right, color: Colors.grey,),
-                        ],
-                      ),
+                      Text(_userInfo['qq'].toString()),
                     ],
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   ),
@@ -165,16 +160,11 @@ class AccountState extends State with AutomaticKeepAliveClientMixin{
               new GestureDetector(
                 behavior: HitTestBehavior.translucent,
                 child: new Padding(
-                  padding: EdgeInsets.only(top: 8, bottom: 8, right: 8),
+                  padding: EdgeInsets.only(top: 8, bottom: 8, right: 20),
                   child: new Row(
                     children: <Widget>[
                       Text('生日', style: TextStyle(fontSize: 16),),
-                      Row(
-                        children: <Widget>[
-                          Text(_userInfo['birthday'].toString()),
-                          Icon(Icons.chevron_right, color: Colors.grey,),
-                        ],
-                      ),
+                      Text(_userInfo['birthday'].toString()),
                     ],
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   ),

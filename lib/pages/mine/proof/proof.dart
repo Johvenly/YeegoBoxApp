@@ -184,7 +184,7 @@ class ProofState extends State<Proof>{
           padding: EdgeInsets.all(15),
           child: new Column(
             children: <Widget>[
-              Text('账号审核时间<i>周一至周五9:30-18:00</i>，账号提交后5个工作日内完成审核，如遇周末或节假日顺延，审核工作人工进行，用户请耐心等待，新手务必查看下方<i>审核要求'),
+              Text('账号审核时间: 周一至周五9:30-18:00，账号提交后5个工作日内完成审核，如遇周末或节假日顺延，审核工作人工进行，用户请耐心等待，新手务必查看下方"审核要求"。'),
               new Padding(
                 padding: EdgeInsets.only(top: 15),
                 child: new FractionallySizedBox(
@@ -251,7 +251,7 @@ class ProofState extends State<Proof>{
               mainAxisSpacing: 15.0,//竖向间距
               crossAxisCount: 4,//横向Item的个数
               crossAxisSpacing: 8.0,//横向间距
-              childAspectRatio: 0.8,
+              childAspectRatio: 0.75,
               children: _imgs.map<Widget>((row){
                 int index = _imgs.indexOf(row);
                 return new Column(
@@ -331,7 +331,7 @@ class ProofState extends State<Proof>{
                     ),
                     SizedBox(
                       height: 20,
-                      child: Text(row['name'], style: TextStyle(height: 1.5, color: Colors.black54),),
+                      child: Text(row['name'], style: TextStyle(height: 1.3, color: Colors.black54, fontSize: 12), maxLines: 1,),
                     )
                   ],
                 );
@@ -339,7 +339,7 @@ class ProofState extends State<Proof>{
             ) : new Container(),
             new Container(
               width: MediaQuery.of(context).size.width,
-              margin: EdgeInsets.only(top: 35),
+              margin: EdgeInsets.only(top: 15),
               padding: EdgeInsets.only(left: 15, right: 15),
               child: new FlatButton(
                 color: Colors.green,

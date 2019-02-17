@@ -134,6 +134,7 @@ class TruecheckState extends State with AutomaticKeepAliveClientMixin{
   @override
   Widget build(BuildContext context){
     Widget _body = !_loaded ? new LoadingView() : new ListView(
+      padding: EdgeInsets.only(bottom: 25),
       children: <Widget>[
         new Container(
           padding: EdgeInsets.only(top:8, bottom:8, left: 15),
