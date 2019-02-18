@@ -132,7 +132,6 @@ class ProofState extends State<Proof>{
             focusedBorder: InputBorder.none,
           ),
           cursorColor: Colors.green,
-          keyboardType: TextInputType.number,
         );
       }else if(row['type'] == 'select'){
         return new GestureDetector(

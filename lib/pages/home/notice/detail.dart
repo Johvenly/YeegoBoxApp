@@ -75,7 +75,6 @@ class NoticeDetailState extends State<NoticeDetail>{
                             child: new FadeInImage.assetNetwork(
                               image: API.host + node.attributes['src'],
                               fit: BoxFit.cover,
-                              fadeInDuration: Duration(seconds: 2),
                               placeholder: 'assets/images/placeholder.jpg',
                               placeholderScale: 3,
                             ),

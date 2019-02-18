@@ -17,6 +17,7 @@ import 'bank/list.dart';
 import 'account/account.dart';
 import 'account/truecheck.dart';
 import 'proof/proof.dart';
+import 'upgrade.dart';
 
 class Mine extends StatefulWidget{
   State<StatefulWidget> createState() => new MineState();
@@ -418,20 +419,29 @@ class MineState extends State with AutomaticKeepAliveClientMixin{
                 },
               ),
               new Divider(indent: 5, height: 0, color: Colors.grey[200]),
-              new Container(
-                child: new Row(
-                  children: <Widget>[
-                    Row(
-                      children: <Widget>[
-                        Icon(FontAwesomeIcons.resolving, size: 18, color: Colors.black45,),
-                        Text('  检查更新', style: TextStyle(fontSize: 16),)
-                      ],
-                    ),
-                    Icon(Icons.chevron_right, color: Colors.grey,)
-                  ],
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              new GestureDetector(
+                behavior: HitTestBehavior.translucent,
+                child: new Container(
+                  child: new Row(
+                    children: <Widget>[
+                      Row(
+                        children: <Widget>[
+                          Icon(FontAwesomeIcons.resolving, size: 18, color: Colors.black45,),
+                          Text('  检查更新', style: TextStyle(fontSize: 16),)
+                        ],
+                      ),
+                      Icon(Icons.chevron_right, color: Colors.grey,)
+                    ],
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  ),
+                  padding: EdgeInsets.only(top: 15, bottom: 15, left: 5, right: 8),
                 ),
-                padding: EdgeInsets.only(top: 15, bottom: 15, left: 5, right: 8),
+                onTap: (){
+                  Navigator.of(super.context).push(
+                    new MaterialPageRoute(
+                        builder: (BuildContext context) => new Upgrade())
+                  );
+                },
               ),
               new Divider(indent: 5, height: 0, color: Colors.grey[200]),
               new GestureDetector(
