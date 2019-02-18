@@ -50,6 +50,9 @@ class API{
   // 会员修改密码接口
   static const String updatePassword = apiurl + r'/user/updatePassword.html';
 
+  // 修改会员字段接口
+  static const String updateField =apiurl + r'/user/field.html';
+
   // 试用任务数量接口，必须参数：account_token(String)，
   static const String getReleaseCount = apiurl + r'/release/count.html';
 

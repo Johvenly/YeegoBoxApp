@@ -6,6 +6,7 @@ import '../../../common/http.dart';
 import '../../../common/user.dart';
 import '../../../common/loading.dart';
 import 'avatar.dart';
+import 'updatefield.dart';
 
 class Account extends StatefulWidget{
   State<StatefulWidget> createState() => new AccountState();
@@ -108,7 +109,19 @@ class AccountState extends State with AutomaticKeepAliveClientMixin{
                   ),
                 ),
                 onTap: (){
-                  
+                  if(_userInfo['username'] != null && _userInfo['username'] != ''){
+                    return;
+                  }
+                  Navigator.of(super.context).push(
+                        new MaterialPageRoute(
+                            builder: (BuildContext context) => new UpdateField(filedname: 'username',)),
+                      ).then((_){
+                        if(_ != null && _ != ''){
+                          setState((){
+                            _userInfo['username'] = _;
+                          });
+                        }
+                      });
                 }
               ),
               new Divider(),

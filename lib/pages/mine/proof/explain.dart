@@ -44,7 +44,6 @@ class ExplainState extends State<Explain>{
                             child: new CachedNetworkImage(
                               imageUrl: API.host + node.attributes['src'],
                               fit: BoxFit.cover,
-                              fadeInDuration: Duration(seconds: 2),
                               placeholder: Image.asset('assets/images/placeholder.jpg', fit: BoxFit.cover,),
                             ),
                           );

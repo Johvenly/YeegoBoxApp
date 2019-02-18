@@ -3,6 +3,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../../config/api.dart';
 import '../../common/user.dart';
 import '../../common/http.dart';
@@ -62,6 +63,21 @@ class HomeState extends State with AutomaticKeepAliveClientMixin{
       if(result['code'] == 1){
         setState(() {
           _notices = result['data'];
+        });
+      }
+    });
+    await Http.post(API.getSlideShow, data: {'pageach': 5}).then((result){
+      if(result['code'] == 1){
+        _slides.clear();
+        setState(() {
+          _slides = result['data'].map<Widget>((row){
+            return CachedNetworkImage(
+              imageUrl: API.host + row['img'],
+              fit: BoxFit.cover,
+              placeholder: Image.asset('assets/images/placeholder.jpg', fit: BoxFit.cover,),
+              errorWidget: Image.asset('assets/images/placeholder.jpg', fit: BoxFit.cover,),
+            );
+          }).toList();
         });
       }
     });
