@@ -51,7 +51,10 @@ class API{
   static const String updatePassword = apiurl + r'/user/updatePassword.html';
 
   // 修改会员字段接口
-  static const String updateField =apiurl + r'/user/field.html';
+  static const String updateField = apiurl + r'/user/field.html';
+
+  // 邀请人列表
+  static const String applyList = apiurl + r'/user/apply.html';
 
   // 试用任务数量接口，必须参数：account_token(String)，
   static const String getReleaseCount = apiurl + r'/release/count.html';
@@ -100,6 +103,9 @@ class API{
 
   // 提现接口
   static const String withdraw = apiurl + r'/wallet/withdraw.html';
+
+  // 账单接口
+  static const String billList =apiurl + r'/wallet/bill.html';
 
   // 获取会员第三方账号绑定详情
   static const String memberProof = apiurl + r'/proof/index.html';

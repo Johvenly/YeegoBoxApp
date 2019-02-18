@@ -30,7 +30,7 @@ class MineState extends State with AutomaticKeepAliveClientMixin{
   //数据控制字段
   bool _login = false;
   bool _loaded = true;
-  Map<String, dynamic> _userInfo;
+  Map<String, dynamic> _userInfo = new Map();
   String _token;
   List _proof;
   RefreshController _controller = new RefreshController();
@@ -44,7 +44,7 @@ class MineState extends State with AutomaticKeepAliveClientMixin{
         }catch(e){}
       });
 
-      initData().then((e){
+      initData().then((_){
         setState(() {
           _loaded = false;
         });
@@ -66,11 +66,17 @@ class MineState extends State with AutomaticKeepAliveClientMixin{
           _login = true;
         });
         //根据缓存初始化用户头像等数据
-        await User.getUserInfo().then((result){
+        await User.getAccountToken().then((token){
           setState(() {
-            _userInfo = result;
-            _token = result[User.FIELD_TOKEN];
+            _token = token;
           });
+        });
+        await Http.post(API.initUser, data: {'account_token': _token}).then((result){
+            if(result['code'] == 1){
+              setState(() {
+                _userInfo = result['data'];
+              });
+            }
         });
         await Http.post(API.memberProof, data: {'account_token': _token}).then((result){
           if(result['code'] == 1){
@@ -121,7 +127,7 @@ class MineState extends State with AutomaticKeepAliveClientMixin{
 
   @override
   Widget build(BuildContext context){
-    Widget _body = new ListView(
+    Widget _body = _loaded ? new ListView() : new ListView(
       padding: EdgeInsets.all(0),
       children: <Widget>[
         /**Avatar Box */

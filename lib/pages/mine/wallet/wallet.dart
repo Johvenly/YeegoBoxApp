@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../common/user.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'withdraw.dart';
+import '../bill/bill.dart';
 
 class Wallet extends StatefulWidget{
   final String type;
@@ -105,6 +106,12 @@ class WalletState extends State<Wallet>{
           actions: <Widget>[
             FlatButton(
               child: Text('明细', style: TextStyle(color: Colors.white, fontSize: 18),),
+              onPressed: (){
+                Navigator.of(super.context).push(
+                  new MaterialPageRoute(
+                      builder: (BuildContext context) => new Bill(type: widget.type)),
+                );
+              },
             ),
           ],
         ),
