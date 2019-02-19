@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
+// import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import '../../config/api.dart';
 import '../../common/http.dart';
 import '../../common/user.dart';
@@ -256,25 +256,25 @@ class RDetailState extends State<RDetail> with TickerProviderStateMixin {
                           // } else {
                           //   throw 'Could not launch $url';
                           // }
-                          Navigator.push(context, new MaterialPageRoute<void>(
-                            builder: (BuildContext context) {
-                              return new WebviewScaffold(
-                                url: url,
-                                appBar: new AppBar(
-                                  title: const Text('打开QQ聊天'),
-                                  backgroundColor: Colors.green,
-                                  leading: new IconButton(
-                                    icon: BackButtonIcon(),
-                                    onPressed: (){
-                                      Navigator.pop(context);
-                                    }
-                                  )
-                                ),
-                                withZoom: true,
-                                withLocalStorage: true,
-                              );
-                            },
-                          ));
+                          // Navigator.push(context, new MaterialPageRoute<void>(
+                          //   builder: (BuildContext context) {
+                          //     return new WebviewScaffold(
+                          //       url: url,
+                          //       appBar: new AppBar(
+                          //         title: const Text('打开QQ聊天'),
+                          //         backgroundColor: Colors.green,
+                          //         leading: new IconButton(
+                          //           icon: BackButtonIcon(),
+                          //           onPressed: (){
+                          //             Navigator.pop(context);
+                          //           }
+                          //         )
+                          //       ),
+                          //       withZoom: true,
+                          //       withLocalStorage: true,
+                          //     );
+                          //   },
+                          // ));
                         },
                       ),
                     ],
